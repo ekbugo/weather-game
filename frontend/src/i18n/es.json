@@ -1,0 +1,115 @@
+{
+  "app": {
+    "title": "Huracán Info Weather Challenge",
+    "tagline": "Desafío Estudiantil de Pronóstico del Tiempo"
+  },
+  "nav": {
+    "home": "Inicio",
+    "forecast": "Pronóstico",
+    "leaderboard": "Clasificación",
+    "history": "Mi Historial",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "profile": "Perfil"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "email": "Correo electrónico",
+    "username": "Nombre de usuario",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "loginSuccess": "¡Inicio de sesión exitoso!",
+    "registerSuccess": "¡Registro exitoso!",
+    "invalidCredentials": "Credenciales inválidas",
+    "emailRequired": "El correo electrónico es requerido",
+    "passwordRequired": "La contraseña es requerida",
+    "passwordMin": "La contraseña debe tener al menos 8 caracteres"
+  },
+  "forecast": {
+    "title": "Enviar Pronóstico",
+    "currentStation": "Estación Actual",
+    "forDate": "Pronóstico para",
+    "maxTemp": "Temperatura Máxima",
+    "minTemp": "Temperatura Mínima",
+    "windGust": "Ráfaga de Viento Máxima",
+    "precipitation": "Precipitación Acumulada",
+    "submit": "Enviar Pronóstico",
+    "submitted": "¡Pronóstico Enviado!",
+    "closed": "Ventana Cerrada",
+    "opensAt": "Próxima ventana abre a las",
+    "closesAt": "Se cierra a las",
+    "remaining": "Tiempo restante",
+    "minutes": "minutos",
+    "alreadySubmitted": "Ya has enviado tu pronóstico para esta fecha",
+    "viewSubmission": "Ver mi pronóstico",
+    "units": {
+      "fahrenheit": "°F",
+      "mph": "mph",
+      "inches": "pulgadas"
+    },
+    "precipRanges": {
+      "1": "0.00\" - 0.10\"",
+      "2": "0.11\" - 0.25\"",
+      "3": "0.26\" - 0.50\"",
+      "4": "0.51\" - 1.00\"",
+      "5": "1.01\" - 1.50\"",
+      "6": "1.51\" - 2.50\"",
+      "7": "2.51\" o más"
+    }
+  },
+  "leaderboard": {
+    "title": "Clasificación",
+    "rank": "Puesto",
+    "username": "Usuario",
+    "points": "Puntos",
+    "allTime": "Histórico",
+    "weekly": "Semanal",
+    "monthly": "Mensual",
+    "yourRank": "Tu posición",
+    "noData": "No hay datos disponibles"
+  },
+  "scores": {
+    "title": "Mi Historial de Puntuaciones",
+    "date": "Fecha",
+    "station": "Estación",
+    "forecast": "Pronóstico",
+    "actual": "Actual",
+    "score": "Puntuación",
+    "total": "Total",
+    "perfectBonus": "¡Bono Perfecto!",
+    "maxTemp": "Temp. Máx.",
+    "minTemp": "Temp. Mín.",
+    "windGust": "Ráfaga",
+    "precip": "Precip.",
+    "noScores": "No tienes puntuaciones todavía"
+  },
+  "stats": {
+    "totalPoints": "Puntos Totales",
+    "forecastsMade": "Pronósticos Realizados",
+    "avgScore": "Promedio por Pronóstico",
+    "perfectForecasts": "Pronósticos Perfectos"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "points": "puntos",
+    "of": "de"
+  },
+  "errors": {
+    "network": "Error de conexión. Verifica tu internet.",
+    "server": "Error del servidor. Intenta más tarde.",
+    "unauthorized": "Sesión expirada. Inicia sesión de nuevo."
+  }
+}
