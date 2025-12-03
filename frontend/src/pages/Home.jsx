@@ -232,7 +232,7 @@ function Home() {
       <div className="bg-white rounded-xl shadow-md p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Sistema de Puntuación</h2>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           <div>
             <h3 className="font-semibold mb-3 flex items-center">
               <Thermometer className="w-5 h-5 mr-2 text-red-500" />
@@ -265,6 +265,40 @@ function Home() {
                 <tr><td className="py-1">±15 mph o más</td><td className="text-right">0 pts</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-3 flex items-center">
+              <Droplets className="w-5 h-5 mr-2 text-blue-400" />
+              Precipitación
+            </h3>
+            <table className="w-full text-sm">
+              <tbody>
+                <tr className="border-b"><td className="py-1">0 rangos diff.</td><td className="text-right font-medium">5 pts</td></tr>
+                <tr className="border-b"><td className="py-1">1 rango diff.</td><td className="text-right">4 pts</td></tr>
+                <tr className="border-b"><td className="py-1">2 rangos diff.</td><td className="text-right">3 pts</td></tr>
+                <tr className="border-b"><td className="py-1">3 rangos diff.</td><td className="text-right">2 pts</td></tr>
+                <tr className="border-b"><td className="py-1">4 rangos diff.</td><td className="text-right">1 pt</td></tr>
+                <tr><td className="py-1">5+ rangos diff.</td><td className="text-right">0 pts</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Precipitation Ranges Info */}
+        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+          <h4 className="font-semibold text-blue-900 mb-3 flex items-center">
+            <Droplets className="w-5 h-5 mr-2 text-blue-600" />
+            Rangos de Precipitación
+          </h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-blue-800">
+            <div><span className="font-medium">Rango 1:</span> 0.00" - 0.10"</div>
+            <div><span className="font-medium">Rango 2:</span> 0.11" - 0.25"</div>
+            <div><span className="font-medium">Rango 3:</span> 0.26" - 0.50"</div>
+            <div><span className="font-medium">Rango 4:</span> 0.51" - 1.00"</div>
+            <div><span className="font-medium">Rango 5:</span> 1.01" - 1.50"</div>
+            <div><span className="font-medium">Rango 6:</span> 1.51" - 2.50"</div>
+            <div className="md:col-span-2"><span className="font-medium">Rango 7:</span> 2.51" o más</div>
           </div>
         </div>
 
