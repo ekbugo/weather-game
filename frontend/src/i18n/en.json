@@ -1,0 +1,115 @@
+{
+  "app": {
+    "title": "Huracán Info Weather Challenge",
+    "tagline": "Student Weather Forecasting Challenge"
+  },
+  "nav": {
+    "home": "Home",
+    "forecast": "Forecast",
+    "leaderboard": "Leaderboard",
+    "history": "My History",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "profile": "Profile"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginSuccess": "Login successful!",
+    "registerSuccess": "Registration successful!",
+    "invalidCredentials": "Invalid credentials",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "passwordMin": "Password must be at least 8 characters"
+  },
+  "forecast": {
+    "title": "Submit Forecast",
+    "currentStation": "Current Station",
+    "forDate": "Forecast for",
+    "maxTemp": "Maximum Temperature",
+    "minTemp": "Minimum Temperature",
+    "windGust": "Maximum Wind Gust",
+    "precipitation": "Accumulated Precipitation",
+    "submit": "Submit Forecast",
+    "submitted": "Forecast Submitted!",
+    "closed": "Window Closed",
+    "opensAt": "Next window opens at",
+    "closesAt": "Closes at",
+    "remaining": "Time remaining",
+    "minutes": "minutes",
+    "alreadySubmitted": "You have already submitted your forecast for this date",
+    "viewSubmission": "View my forecast",
+    "units": {
+      "fahrenheit": "°F",
+      "mph": "mph",
+      "inches": "inches"
+    },
+    "precipRanges": {
+      "1": "0.00\" - 0.10\"",
+      "2": "0.11\" - 0.25\"",
+      "3": "0.26\" - 0.50\"",
+      "4": "0.51\" - 1.00\"",
+      "5": "1.01\" - 1.50\"",
+      "6": "1.51\" - 2.50\"",
+      "7": "2.51\" or more"
+    }
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "rank": "Rank",
+    "username": "Username",
+    "points": "Points",
+    "allTime": "All Time",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "yourRank": "Your rank",
+    "noData": "No data available"
+  },
+  "scores": {
+    "title": "My Score History",
+    "date": "Date",
+    "station": "Station",
+    "forecast": "Forecast",
+    "actual": "Actual",
+    "score": "Score",
+    "total": "Total",
+    "perfectBonus": "Perfect Bonus!",
+    "maxTemp": "Max Temp",
+    "minTemp": "Min Temp",
+    "windGust": "Wind Gust",
+    "precip": "Precip.",
+    "noScores": "You don't have any scores yet"
+  },
+  "stats": {
+    "totalPoints": "Total Points",
+    "forecastsMade": "Forecasts Made",
+    "avgScore": "Average Score",
+    "perfectForecasts": "Perfect Forecasts"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "points": "points",
+    "of": "of"
+  },
+  "errors": {
+    "network": "Connection error. Check your internet.",
+    "server": "Server error. Try again later.",
+    "unauthorized": "Session expired. Please log in again."
+  }
+}

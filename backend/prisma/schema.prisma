@@ -1,0 +1,128 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int        @id @default(autoincrement())
+  email         String     @unique
+  username      String     @unique
+  passwordHash  String     @map("password_hash")
+  preferredLang String     @default("es") @map("preferred_lang") // 'es' or 'en'
+  totalPoints   Int        @default(0) @map("total_points")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  forecasts     Forecast[]
+  scores        Score[]
+
+  @@index([totalPoints(sort: Desc)])
+  @@map("users")
+}
+
+model Station {
+  id              String   @id // e.g., 'IAGUAD73'
+  name            String
+  locationDesc    String?  @map("location_desc")
+  latitude        Decimal? @db.Decimal(10, 6)
+  longitude       Decimal? @db.Decimal(10, 6)
+  wundergroundUrl String?  @map("wunderground_url")
+
+  schedules       WeeklySchedule[]
+  forecasts       Forecast[]
+  readings        StationReading[]
+
+  @@map("stations")
+}
+
+model WeeklySchedule {
+  id          Int       @id @default(autoincrement())
+  stationId   String    @map("station_id")
+  weekStart   DateTime  @map("week_start") @db.Date // Monday of the week
+  announcedAt DateTime? @map("announced_at")
+
+  station     Station   @relation(fields: [stationId], references: [id])
+
+  @@unique([stationId, weekStart])
+  @@map("weekly_schedule")
+}
+
+model Forecast {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  stationId    String   @map("station_id")
+  forecastDate DateTime @map("forecast_date") @db.Date
+
+  // User's predictions
+  maxTemp      Int      @map("max_temp")      // °F
+  minTemp      Int      @map("min_temp")      // °F
+  windGust     Int      @map("wind_gust")     // mph
+  precipRange  Int      @map("precip_range")  // 1-7
+
+  submittedAt  DateTime @default(now()) @map("submitted_at")
+
+  user         User     @relation(fields: [userId], references: [id])
+  station      Station  @relation(fields: [stationId], references: [id])
+  score        Score?
+
+  @@unique([userId, forecastDate])
+  @@index([forecastDate])
+  @@map("forecasts")
+}
+
+model StationReading {
+  id               Int      @id @default(autoincrement())
+  stationId        String   @map("station_id")
+  readingDate      DateTime @map("reading_date") @db.Date
+
+  maxTempRaw       Decimal  @map("max_temp_raw") @db.Decimal(5, 2)
+  maxTempRounded   Int      @map("max_temp_rounded")
+  minTempRaw       Decimal  @map("min_temp_raw") @db.Decimal(5, 2)
+  minTempRounded   Int      @map("min_temp_rounded")
+  windGustMax      Decimal  @map("wind_gust_max") @db.Decimal(5, 2)
+  precipTotal      Decimal  @map("precip_total") @db.Decimal(5, 2)
+  precipRange      Int      @map("precip_range") // calculated 1-7
+
+  importedAt       DateTime @default(now()) @map("imported_at")
+
+  station          Station  @relation(fields: [stationId], references: [id])
+  scores           Score[]
+
+  @@unique([stationId, readingDate])
+  @@index([readingDate])
+  @@map("station_readings")
+}
+
+model Score {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @map("user_id")
+  forecastId    Int      @unique @map("forecast_id")
+  readingId     Int      @map("reading_id")
+  scoreDate     DateTime @map("score_date") @db.Date
+
+  // Individual scores
+  maxTempScore  Int      @map("max_temp_score")   // 0-5
+  minTempScore  Int      @map("min_temp_score")   // 0-5
+  windGustScore Int      @map("wind_gust_score")  // 0-5
+  precipScore   Int      @map("precip_score")     // 0-5
+  perfectBonus  Int      @default(0) @map("perfect_bonus") // +5 if all perfect
+
+  totalScore    Int      @map("total_score")
+
+  calculatedAt  DateTime @default(now()) @map("calculated_at")
+
+  user          User     @relation(fields: [userId], references: [id])
+  forecast      Forecast @relation(fields: [forecastId], references: [id])
+  reading       StationReading @relation(fields: [readingId], references: [id])
+
+  @@unique([userId, scoreDate])
+  @@index([scoreDate])
+  @@map("scores")
+}

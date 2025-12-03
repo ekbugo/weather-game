@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="hurricaneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0c9feb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#007fc9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="45" fill="url(#hurricaneGrad)"/>
+  <g fill="white" opacity="0.9">
+    <path d="M50 25 C35 25, 25 40, 25 50 C25 60, 35 75, 50 75 C45 65, 45 55, 50 50 C55 55, 55 65, 50 75 C65 75, 75 60, 75 50 C75 40, 65 25, 50 25 Z" fill="white"/>
+    <circle cx="50" cy="50" r="8" fill="#007fc9"/>
+  </g>
+</svg>
