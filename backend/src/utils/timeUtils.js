@@ -1,12 +1,21 @@
 const { DateTime } = require('luxon');
 
 const AST_ZONE = 'America/Puerto_Rico';
+const AST_OFFSET = -4; // AST is UTC-4
 
 /**
  * Get current time in AST (Atlantic Standard Time - Puerto Rico)
  */
 function nowAST() {
-  return DateTime.now().setZone(AST_ZONE);
+  const dt = DateTime.now().setZone(AST_ZONE);
+
+  // Fallback: if timezone data isn't available, manually set offset
+  if (dt.zoneName === 'UTC' || dt.offset === 0) {
+    console.warn('[TimeUtils] Timezone data not available, using manual AST offset');
+    return DateTime.utc().plus({ hours: AST_OFFSET });
+  }
+
+  return dt;
 }
 
 /**
@@ -68,6 +77,12 @@ function getCurrentForecastDate() {
 function getSubmissionWindow() {
   const now = nowAST();
   const currentForecastDate = getCurrentForecastDate();
+
+  // Debug logging
+  console.log('[TimeUtils] Current AST time:', now.toISO());
+  console.log('[TimeUtils] Current hour (AST):', now.hour);
+  console.log('[TimeUtils] Current forecast date:', currentForecastDate);
+  console.log('[TimeUtils] Timezone info:', now.zoneName, '(offset:', now.offset, 'minutes)');
 
   if (currentForecastDate) {
     const forecastDateObj = DateTime.fromISO(currentForecastDate, { zone: AST_ZONE });
