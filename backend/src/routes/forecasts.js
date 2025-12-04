@@ -41,11 +41,15 @@ router.get('/status', (req, res) => {
     ...getPrecipRangeDescription(range)
   }));
 
-  res.json({
+  const response = {
     ...window,
     precipRanges,
     currentTime: nowAST().toISO()
-  });
+  };
+
+  console.log('[Forecasts API] /status response:', JSON.stringify(response, null, 2));
+
+  res.json(response);
 });
 
 /**
