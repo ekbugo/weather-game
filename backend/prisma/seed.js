@@ -49,29 +49,40 @@ async function main() {
 
   console.log('✅ Seeded 4 weather stations');
 
-  // Create an example weekly schedule (current week)
+  // Create weekly schedules for current week and next 3 weeks
   const today = new Date();
   const dayOfWeek = today.getDay();
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-  monday.setHours(0, 0, 0, 0);
+  const currentMonday = new Date(today);
+  currentMonday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  currentMonday.setHours(0, 0, 0, 0);
 
-  await prisma.weeklySchedule.upsert({
-    where: {
-      stationId_weekStart: {
-        stationId: 'IMAYAG30',
-        weekStart: monday
+  // Rotate through stations for each week
+  const stationRotation = ['IMAYAG30', 'ICAYEY43', 'IAGUAD73', 'ICABOR73'];
+
+  for (let week = 0; week < 4; week++) {
+    const monday = new Date(currentMonday);
+    monday.setDate(currentMonday.getDate() + (week * 7));
+
+    const stationId = stationRotation[week % stationRotation.length];
+    const announcedAt = new Date(monday.getTime() - 3 * 24 * 60 * 60 * 1000); // Previous Friday
+
+    await prisma.weeklySchedule.upsert({
+      where: {
+        stationId_weekStart: {
+          stationId,
+          weekStart: monday
+        }
+      },
+      update: {},
+      create: {
+        stationId,
+        weekStart: monday,
+        announcedAt
       }
-    },
-    update: {},
-    create: {
-      stationId: 'IMAYAG30',
-      weekStart: monday,
-      announcedAt: new Date(monday.getTime() - 3 * 24 * 60 * 60 * 1000) // Previous Friday
-    }
-  });
+    });
 
-  console.log('✅ Seeded weekly schedule');
+    console.log(`✅ Seeded schedule for week of ${monday.toISOString().split('T')[0]}: ${stationId}`);
+  }
 }
 
 main()
