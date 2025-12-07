@@ -135,17 +135,15 @@ npm run calculate-scores
 
 ### Recommended: Vercel + Render
 
-1. **Frontend (Vercel)**
+1. **Frontend (GitHub Pages)**
    - Connect your GitHub repo
    - Set root directory to `frontend`
    - Add environment variables
 
-2. **Backend + Database (Render)**
+2. **Backend + Database (Railway)**
    - Create PostgreSQL database
    - Create Web Service from `backend` directory
    - Add environment variables
    - Set up cron jobs for data import/scoring
 
 ## License
-
-MIT
