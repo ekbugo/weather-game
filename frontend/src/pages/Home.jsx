@@ -183,16 +183,16 @@ function Home() {
 
       {/* How it Works */}
       <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">¿Cómo funciona?</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">{t('home.howItWorks')}</h2>
 
         <div className="grid md:grid-cols-4 gap-6">
           <div className="text-center">
             <div className="w-12 h-12 bg-hurricane-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <Thermometer className="w-6 h-6 text-hurricane-600" />
             </div>
-            <h3 className="font-semibold mb-2">1. Pronostica</h3>
+            <h3 className="font-semibold mb-2">{t('home.step1Title')}</h3>
             <p className="text-sm text-gray-500">
-              Predice temperatura máxima y mínima, ráfagas de viento y precipitación
+              {t('home.step1Desc')}
             </p>
           </div>
 
@@ -200,9 +200,9 @@ function Home() {
             <div className="w-12 h-12 bg-hurricane-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <Clock className="w-6 h-6 text-hurricane-600" />
             </div>
-            <h3 className="font-semibold mb-2">2. Envía antes de las 5 PM</h3>
+            <h3 className="font-semibold mb-2">{t('home.step2Title')}</h3>
             <p className="text-sm text-gray-500">
-              La ventana de envío cierra a las 5:00 PM AST del día anterior
+              {t('home.step2Desc')}
             </p>
           </div>
 
@@ -210,9 +210,9 @@ function Home() {
             <div className="w-12 h-12 bg-hurricane-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <Cloud className="w-6 h-6 text-hurricane-600" />
             </div>
-            <h3 className="font-semibold mb-2">3. Compara</h3>
+            <h3 className="font-semibold mb-2">{t('home.step3Title')}</h3>
             <p className="text-sm text-gray-500">
-              Tu pronóstico se compara con los datos reales de la estación
+              {t('home.step3Desc')}
             </p>
           </div>
 
@@ -220,9 +220,9 @@ function Home() {
             <div className="w-12 h-12 bg-hurricane-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <Trophy className="w-6 h-6 text-hurricane-600" />
             </div>
-            <h3 className="font-semibold mb-2">4. Gana puntos</h3>
+            <h3 className="font-semibold mb-2">{t('home.step4Title')}</h3>
             <p className="text-sm text-gray-500">
-              Hasta 20 puntos por día + 5 puntos bonus por pronóstico perfecto
+              {t('home.step4Desc')}
             </p>
           </div>
         </div>
@@ -230,22 +230,22 @@ function Home() {
 
       {/* Scoring Info */}
       <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Sistema de Puntuación</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">{t('home.scoringSystem')}</h2>
 
         <div className="grid md:grid-cols-3 gap-6">
           <div>
             <h3 className="font-semibold mb-3 flex items-center">
               <Thermometer className="w-5 h-5 mr-2 text-red-500" />
-              Temperatura (Máx/Mín)
+              {t('home.temperature')}
             </h3>
             <table className="w-full text-sm">
               <tbody>
-                <tr className="border-b"><td className="py-1">Exacto (0°F)</td><td className="text-right font-medium">5 pts</td></tr>
+                <tr className="border-b"><td className="py-1">{t('home.exact')} (0°F)</td><td className="text-right font-medium">5 pts</td></tr>
                 <tr className="border-b"><td className="py-1">±1°F</td><td className="text-right">4 pts</td></tr>
                 <tr className="border-b"><td className="py-1">±2°F</td><td className="text-right">3 pts</td></tr>
                 <tr className="border-b"><td className="py-1">±3°F</td><td className="text-right">2 pts</td></tr>
                 <tr className="border-b"><td className="py-1">±4°F</td><td className="text-right">1 pt</td></tr>
-                <tr><td className="py-1">±5°F o más</td><td className="text-right">0 pts</td></tr>
+                <tr><td className="py-1">±5°F {t('home.orMore')}</td><td className="text-right">0 pts</td></tr>
               </tbody>
             </table>
           </div>
@@ -253,16 +253,16 @@ function Home() {
           <div>
             <h3 className="font-semibold mb-3 flex items-center">
               <Wind className="w-5 h-5 mr-2 text-blue-500" />
-              Ráfaga de Viento
+              {t('home.windGust')}
             </h3>
             <table className="w-full text-sm">
               <tbody>
-                <tr className="border-b"><td className="py-1">Exacto (0 mph)</td><td className="text-right font-medium">5 pts</td></tr>
+                <tr className="border-b"><td className="py-1">{t('home.exact')} (0 mph)</td><td className="text-right font-medium">5 pts</td></tr>
                 <tr className="border-b"><td className="py-1">±1-2 mph</td><td className="text-right">4 pts</td></tr>
                 <tr className="border-b"><td className="py-1">±3-5 mph</td><td className="text-right">3 pts</td></tr>
                 <tr className="border-b"><td className="py-1">±6-9 mph</td><td className="text-right">2 pts</td></tr>
                 <tr className="border-b"><td className="py-1">±10-14 mph</td><td className="text-right">1 pt</td></tr>
-                <tr><td className="py-1">±15 mph o más</td><td className="text-right">0 pts</td></tr>
+                <tr><td className="py-1">±15 mph {t('home.orMore')}</td><td className="text-right">0 pts</td></tr>
               </tbody>
             </table>
           </div>
@@ -270,16 +270,16 @@ function Home() {
           <div>
             <h3 className="font-semibold mb-3 flex items-center">
               <Droplets className="w-5 h-5 mr-2 text-blue-400" />
-              Precipitación
+              {t('home.precipitation')}
             </h3>
             <table className="w-full text-sm">
               <tbody>
-                <tr className="border-b"><td className="py-1">0 rangos diff.</td><td className="text-right font-medium">5 pts</td></tr>
-                <tr className="border-b"><td className="py-1">1 rango diff.</td><td className="text-right">4 pts</td></tr>
-                <tr className="border-b"><td className="py-1">2 rangos diff.</td><td className="text-right">3 pts</td></tr>
-                <tr className="border-b"><td className="py-1">3 rangos diff.</td><td className="text-right">2 pts</td></tr>
-                <tr className="border-b"><td className="py-1">4 rangos diff.</td><td className="text-right">1 pt</td></tr>
-                <tr><td className="py-1">5+ rangos diff.</td><td className="text-right">0 pts</td></tr>
+                <tr className="border-b"><td className="py-1">0 {t('home.rangesDiff')}</td><td className="text-right font-medium">5 pts</td></tr>
+                <tr className="border-b"><td className="py-1">1 {t('home.rangeDiff')}</td><td className="text-right">4 pts</td></tr>
+                <tr className="border-b"><td className="py-1">2 {t('home.rangesDiff')}</td><td className="text-right">3 pts</td></tr>
+                <tr className="border-b"><td className="py-1">3 {t('home.rangesDiff')}</td><td className="text-right">2 pts</td></tr>
+                <tr className="border-b"><td className="py-1">4 {t('home.rangesDiff')}</td><td className="text-right">1 pt</td></tr>
+                <tr><td className="py-1">5+ {t('home.rangesDiff')}</td><td className="text-right">0 pts</td></tr>
               </tbody>
             </table>
           </div>
@@ -289,16 +289,16 @@ function Home() {
         <div className="mt-6 p-4 bg-blue-50 rounded-lg">
           <h4 className="font-semibold text-blue-900 mb-3 flex items-center">
             <Droplets className="w-5 h-5 mr-2 text-blue-600" />
-            Rangos de Precipitación
+            {t('home.precipRangesTitle')}
           </h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-blue-800">
-            <div><span className="font-medium">Rango 1:</span> 0.00" - 0.10"</div>
-            <div><span className="font-medium">Rango 2:</span> 0.11" - 0.25"</div>
-            <div><span className="font-medium">Rango 3:</span> 0.26" - 0.50"</div>
-            <div><span className="font-medium">Rango 4:</span> 0.51" - 1.00"</div>
-            <div><span className="font-medium">Rango 5:</span> 1.01" - 1.50"</div>
-            <div><span className="font-medium">Rango 6:</span> 1.51" - 2.50"</div>
-            <div className="md:col-span-2"><span className="font-medium">Rango 7:</span> 2.51" o más</div>
+            <div><span className="font-medium">{t('home.range')} 1:</span> {t('forecast.precipRanges.1')}</div>
+            <div><span className="font-medium">{t('home.range')} 2:</span> {t('forecast.precipRanges.2')}</div>
+            <div><span className="font-medium">{t('home.range')} 3:</span> {t('forecast.precipRanges.3')}</div>
+            <div><span className="font-medium">{t('home.range')} 4:</span> {t('forecast.precipRanges.4')}</div>
+            <div><span className="font-medium">{t('home.range')} 5:</span> {t('forecast.precipRanges.5')}</div>
+            <div><span className="font-medium">{t('home.range')} 6:</span> {t('forecast.precipRanges.6')}</div>
+            <div className="md:col-span-2"><span className="font-medium">{t('home.range')} 7:</span> {t('forecast.precipRanges.7')}</div>
           </div>
         </div>
 
@@ -306,11 +306,11 @@ function Home() {
           <div className="flex items-center">
             <Star className="w-6 h-6 text-purple-500 mr-2" />
             <span className="font-semibold text-purple-700">
-              ¡Bono de Pronóstico Perfecto: +5 puntos!
+              {t('home.perfectBonusTitle')}
             </span>
           </div>
           <p className="text-sm text-purple-600 mt-1">
-            Si aciertas todos los parámetros perfectamente, recibes 5 puntos adicionales.
+            {t('home.perfectBonusDesc')}
           </p>
         </div>
       </div>
