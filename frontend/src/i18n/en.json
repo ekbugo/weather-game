@@ -61,12 +61,7 @@
       "6": "1.51\" - 2.50\"",
       "7": "2.51\" or more"
     },
-    "stations": {
-      "ICAYEY43": "Weather station located in Cayey, Puerto Rico. Mountainous region with cooler temperatures.",
-      "IAGUAD73": "Weather station located in Aguadilla, Puerto Rico. Coastal area in the northwest.",
-      "IMAYAG30": "Weather station located in Mayagüez, Puerto Rico. Western coastal city.",
-      "ICABOR73": "Weather station located in Cabo Rojo, Puerto Rico. Southwestern coastal area."
-    },
+    "stationLocation": "Weather station located in Puerto Rico",
     "viewOnWunderground": "View station on Weather Underground"
   },
   "leaderboard": {
