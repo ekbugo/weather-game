@@ -105,7 +105,7 @@ function Home() {
                 {currentStation.station?.name}
               </h3>
               <p className="text-gray-500 mt-1">
-                {t(`forecast.stations.${currentStation.station?.id}`)}
+                {t('forecast.stationLocation')}
               </p>
               <p className="text-sm text-gray-400 mt-2">
                 ID: {currentStation.station?.id}
