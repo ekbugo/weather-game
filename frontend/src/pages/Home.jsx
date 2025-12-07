@@ -105,7 +105,7 @@ function Home() {
                 {currentStation.station?.name}
               </h3>
               <p className="text-gray-500 mt-1">
-                {currentStation.station?.locationDesc}
+                {t(`forecast.stations.${currentStation.station?.id}`)}
               </p>
               <p className="text-sm text-gray-400 mt-2">
                 ID: {currentStation.station?.id}
@@ -129,7 +129,7 @@ function Home() {
               rel="noopener noreferrer"
               className="inline-flex items-center mt-4 text-hurricane-600 hover:text-hurricane-700"
             >
-              Ver estación en Weather Underground
+              {t('forecast.viewOnWunderground')}
               <ArrowRight className="ml-1 w-4 h-4" />
             </a>
           )}
