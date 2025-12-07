@@ -78,12 +78,6 @@ function getSubmissionWindow() {
   const now = nowAST();
   const currentForecastDate = getCurrentForecastDate();
 
-  // Debug logging
-  console.log('[TimeUtils] Current AST time:', now.toISO());
-  console.log('[TimeUtils] Current hour (AST):', now.hour);
-  console.log('[TimeUtils] Current forecast date:', currentForecastDate);
-  console.log('[TimeUtils] Timezone info:', now.zoneName, '(offset:', now.offset, 'minutes)');
-
   if (currentForecastDate) {
     const forecastDateObj = DateTime.fromISO(currentForecastDate, { zone: AST_ZONE });
     const closesAt = forecastDateObj.minus({ days: 1 }).set({ hour: 17, minute: 0, second: 0 });
