@@ -1,0 +1,41 @@
+name: Daily Score Calculation
+
+on:
+  schedule:
+    # Run every day at 3:00 AM AST (7:00 AM UTC)
+    # Adjust the time as needed for your timezone
+    - cron: '0 7 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  calculate-scores:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger score calculation
+        run: |
+          echo "🔄 Triggering score calculation..."
+
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            "${{ secrets.RAILWAY_API_URL }}/api/cron/calculate-scores" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n-1)
+
+          echo "Response: $body"
+          echo "HTTP Status: $http_code"
+
+          if [ "$http_code" != "200" ]; then
+            echo "❌ Score calculation failed!"
+            exit 1
+          fi
+
+          echo "✅ Score calculation completed successfully!"
+          echo "$body" | jq '.'
+
+      - name: Send notification on failure
+        if: failure()
+        run: |
+          echo "⚠️ Score calculation job failed. Please check the logs."
