@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "build": "npx prisma generate",
     "import-readings": "node scripts/importReadings.js",
     "calculate-scores": "node scripts/calculateScores.js",
     "db:migrate": "npx prisma migrate dev",
