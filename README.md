@@ -131,19 +131,47 @@ npm run calculate-scores
 
 **Perfect Forecast Bonus:** +5 points if all parameters are perfect
 
+## Documentation
+
+- **[📚 API Endpoints Reference](backend/API_ENDPOINTS.md)** - Complete API documentation with request/response examples
+- **[💾 Database Setup Guide](backend/DATABASE_SETUP.md)** - Database configuration and persistence details
+- **[🚀 Deployment Guide](DEPLOYMENT.md)** - Step-by-step deployment instructions for Railway + GitHub Pages
+
 ## Deployment
 
-### Recommended: Vercel + Render
+This project is designed to deploy with:
+- **Backend**: Railway (Node.js + PostgreSQL)
+- **Frontend**: GitHub Pages (React SPA)
 
-1. **Frontend (GitHub Pages)**
-   - Connect your GitHub repo
-   - Set root directory to `frontend`
-   - Add environment variables
+### Quick Deployment Steps
 
-2. **Backend + Database (Railway)**
-   - Create PostgreSQL database
-   - Create Web Service from `backend` directory
-   - Add environment variables
-   - Set up cron jobs for data import/scoring
+1. **Deploy Backend to Railway**
+   - Connect your GitHub repository
+   - Add PostgreSQL database
+   - Set environment variables (JWT_SECRET, etc.)
+   - Run `npm run db:seed` once to populate stations
+
+2. **Deploy Frontend to GitHub Pages**
+   - Enable GitHub Pages in repository settings
+   - Set `VITE_API_URL` secret with your Railway URL
+   - Push to main branch (auto-deploys via GitHub Actions)
+
+✅ **Database persists automatically** on Railway - seed data only once!
+
+For detailed instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+## Testing Endpoints
+
+Once deployed, verify your backend is working:
+
+```bash
+# Health check
+curl https://your-app.railway.app/api/health
+
+# Get stations
+curl https://your-app.railway.app/api/stations
+```
+
+Your frontend will be available at: `https://<username>.github.io/weather-game/`
 
 ## License
