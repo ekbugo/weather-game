@@ -67,6 +67,56 @@ router.all('/import-readings', validateCronSecret, async (req, res) => {
 });
 
 /**
+ * GET /api/cron/debug-dates
+ * Check forecast and reading dates (for debugging)
+ */
+router.get('/debug-dates', validateCronSecret, async (req, res) => {
+  try {
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+
+    const forecasts = await prisma.forecast.findMany({
+      select: {
+        id: true,
+        forecastDate: true,
+        stationId: true,
+        user: { select: { username: true } }
+      },
+      orderBy: { forecastDate: 'desc' }
+    });
+
+    const readings = await prisma.stationReading.findMany({
+      select: {
+        id: true,
+        readingDate: true,
+        stationId: true
+      },
+      orderBy: { readingDate: 'desc' }
+    });
+
+    res.json({
+      forecasts: forecasts.map(f => ({
+        date: f.forecastDate.toISOString().split('T')[0],
+        station: f.stationId,
+        user: f.user.username
+      })),
+      readings: readings.map(r => ({
+        date: r.readingDate.toISOString().split('T')[0],
+        station: r.stationId
+      })),
+      summary: {
+        totalForecasts: forecasts.length,
+        totalReadings: readings.length,
+        forecastDates: [...new Set(forecasts.map(f => f.forecastDate.toISOString().split('T')[0]))],
+        readingDates: [...new Set(readings.map(r => r.readingDate.toISOString().split('T')[0]))]
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * GET /api/cron/health
  * Check cron service health
  */
