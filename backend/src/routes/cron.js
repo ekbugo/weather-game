@@ -17,10 +17,10 @@ function validateCronSecret(req, res, next) {
 }
 
 /**
- * POST /api/cron/calculate-scores
+ * POST/GET /api/cron/calculate-scores
  * Trigger score calculation (protected endpoint)
  */
-router.post('/calculate-scores', validateCronSecret, async (req, res) => {
+router.all('/calculate-scores', validateCronSecret, async (req, res) => {
   try {
     console.log('🔄 Score calculation triggered via API');
 
@@ -42,10 +42,10 @@ router.post('/calculate-scores', validateCronSecret, async (req, res) => {
 });
 
 /**
- * POST /api/cron/import-readings
+ * POST/GET /api/cron/import-readings
  * Trigger weather data import (protected endpoint)
  */
-router.post('/import-readings', validateCronSecret, async (req, res) => {
+router.all('/import-readings', validateCronSecret, async (req, res) => {
   try {
     console.log('📥 Weather data import triggered via API');
 
