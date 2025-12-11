@@ -8,13 +8,36 @@ on:
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
-  calculate-scores:
+  import-and-calculate:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Trigger score calculation
+      - name: Import weather readings
         run: |
-          echo "🔄 Triggering score calculation..."
+          echo "📥 Importing weather readings..."
+
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            "${{ secrets.RAILWAY_API_URL }}/api/cron/import-readings" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n-1)
+
+          echo "Response: $body"
+          echo "HTTP Status: $http_code"
+
+          if [ "$http_code" != "200" ]; then
+            echo "❌ Import failed!"
+            exit 1
+          fi
+
+          echo "✅ Import completed successfully!"
+          echo "$body" | jq '.'
+
+      - name: Calculate scores
+        run: |
+          echo "🔄 Calculating scores..."
 
           response=$(curl -s -w "\n%{http_code}" -X POST \
             "${{ secrets.RAILWAY_API_URL }}/api/cron/calculate-scores" \
@@ -38,4 +61,4 @@ jobs:
       - name: Send notification on failure
         if: failure()
         run: |
-          echo "⚠️ Score calculation job failed. Please check the logs."
+          echo "⚠️ Daily processing job failed. Please check the logs."
