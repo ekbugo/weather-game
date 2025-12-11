@@ -1,5 +1,5 @@
 const express = require('express');
-const { calculateScores } = require('../services/cronService');
+const { calculateScores, importReadings } = require('../services/cronService');
 
 const router = express.Router();
 
@@ -36,6 +36,31 @@ router.post('/calculate-scores', validateCronSecret, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Score calculation failed',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/cron/import-readings
+ * Trigger weather data import (protected endpoint)
+ */
+router.post('/import-readings', validateCronSecret, async (req, res) => {
+  try {
+    console.log('📥 Weather data import triggered via API');
+
+    const results = await importReadings();
+
+    res.json({
+      success: true,
+      message: 'Weather data import completed',
+      results
+    });
+  } catch (error) {
+    console.error('Import readings error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Import failed',
       message: error.message
     });
   }
