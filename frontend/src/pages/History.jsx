@@ -105,7 +105,8 @@ function History() {
                     <div>
                       <p className="font-semibold text-gray-900">
                         {(() => {
-                          const [year, month, day] = score.date.split('-');
+                          const dateStr = score.date.split('T')[0]; // Extract YYYY-MM-DD from ISO string
+                          const [year, month, day] = dateStr.split('-');
                           return new Date(year, month - 1, day).toLocaleDateString('es-PR', {
                             weekday: 'short',
                             year: 'numeric',
