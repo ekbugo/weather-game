@@ -192,6 +192,89 @@ router.get('/debug-reading/:stationId/:date', validateCronSecret, async (req, re
 });
 
 /**
+ * GET /api/cron/debug-scores/:username
+ * Check all scores for a specific user
+ */
+router.get('/debug-scores/:username', validateCronSecret, async (req, res) => {
+  try {
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+
+    const { username } = req.params;
+
+    const user = await prisma.user.findUnique({
+      where: { username },
+      select: { id: true, totalPoints: true }
+    });
+
+    if (!user) {
+      return res.json({ error: 'User not found', username });
+    }
+
+    const scores = await prisma.score.findMany({
+      where: { userId: user.id },
+      include: {
+        forecast: {
+          select: {
+            forecastDate: true,
+            stationId: true,
+            maxTemp: true,
+            minTemp: true,
+            windGust: true,
+            precipRange: true
+          }
+        },
+        reading: {
+          select: {
+            readingDate: true,
+            maxTempRounded: true,
+            minTempRounded: true,
+            windGustMax: true,
+            precipRange: true
+          }
+        }
+      },
+      orderBy: { scoreDate: 'desc' }
+    });
+
+    res.json({
+      username,
+      totalPoints: user.totalPoints,
+      scoresCount: scores.length,
+      scores: scores.map(s => ({
+        scoreId: s.id,
+        scoreDate: s.scoreDate.toISOString().split('T')[0],
+        forecastDate: s.forecast.forecastDate.toISOString().split('T')[0],
+        readingDate: s.reading.readingDate.toISOString().split('T')[0],
+        station: s.forecast.stationId,
+        forecast: {
+          maxTemp: s.forecast.maxTemp,
+          minTemp: s.forecast.minTemp,
+          windGust: s.forecast.windGust,
+          precipRange: s.forecast.precipRange
+        },
+        actual: {
+          maxTemp: s.reading.maxTempRounded,
+          minTemp: s.reading.minTempRounded,
+          windGust: Math.round(Number(s.reading.windGustMax)),
+          precipRange: s.reading.precipRange
+        },
+        points: {
+          maxTemp: s.maxTempScore,
+          minTemp: s.minTempScore,
+          windGust: s.windGustScore,
+          precip: s.precipScore,
+          bonus: s.perfectBonus,
+          total: s.totalScore
+        }
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * GET /api/cron/health
  * Check cron service health
  */
