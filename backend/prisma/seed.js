@@ -36,6 +36,14 @@ async function main() {
       latitude: 18.0866,
       longitude: -67.1457,
       wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/ICABOR73'
+    },
+    {
+      id: 'IARECI42',
+      name: 'Arecibo Station',
+      locationDesc: 'Weather station located in Arecibo, Puerto Rico.',
+      latitude: 18.47,
+      longitude: -66.70,
+      wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IARECI42'
     }
   ];
 
