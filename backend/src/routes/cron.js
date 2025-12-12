@@ -398,6 +398,64 @@ router.all('/reimport-reading/:stationId/:date', validateCronSecret, async (req,
 });
 
 /**
+ * POST/GET /api/cron/recalculate-user-total/:username
+ * Recalculate a user's total points from their scores
+ */
+router.all('/recalculate-user-total/:username', validateCronSecret, async (req, res) => {
+  try {
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+
+    const { username } = req.params;
+
+    console.log(`🔄 Recalculating total points for ${username}`);
+
+    // Find the user
+    const user = await prisma.user.findUnique({
+      where: { username }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found', username });
+    }
+
+    // Sum all scores for this user
+    const scores = await prisma.score.findMany({
+      where: { userId: user.id },
+      select: { totalScore: true }
+    });
+
+    const totalPoints = scores.reduce((sum, score) => sum + score.totalScore, 0);
+    const oldTotal = user.totalPoints;
+
+    // Update user's total points
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { totalPoints }
+    });
+
+    console.log(`✅ Updated ${username}: ${oldTotal} → ${totalPoints} points`);
+
+    res.json({
+      success: true,
+      message: `Total points recalculated for ${username}`,
+      username,
+      oldTotal,
+      newTotal: totalPoints,
+      scoresCount: scores.length
+    });
+
+  } catch (error) {
+    console.error('Recalculate user total error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Recalculation failed',
+      message: error.message
+    });
+  }
+});
+
+/**
  * GET /api/cron/health
  * Check cron service health
  */
