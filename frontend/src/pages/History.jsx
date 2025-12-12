@@ -104,12 +104,15 @@ function History() {
                   <div className="flex items-center space-x-4">
                     <div>
                       <p className="font-semibold text-gray-900">
-                        {new Date(score.date + 'T12:00:00').toLocaleDateString('es-PR', {
-                          weekday: 'short',
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
+                        {(() => {
+                          const [year, month, day] = score.date.split('-');
+                          return new Date(year, month - 1, day).toLocaleDateString('es-PR', {
+                            weekday: 'short',
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          });
+                        })()}
                       </p>
                       <p className="text-sm text-gray-500">{score.station.name}</p>
                     </div>
