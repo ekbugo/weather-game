@@ -104,7 +104,7 @@ function History() {
                   <div className="flex items-center space-x-4">
                     <div>
                       <p className="font-semibold text-gray-900">
-                        {new Date(score.date).toLocaleDateString('es-PR', {
+                        {new Date(score.date + 'T12:00:00').toLocaleDateString('es-PR', {
                           weekday: 'short',
                           year: 'numeric',
                           month: 'short',
