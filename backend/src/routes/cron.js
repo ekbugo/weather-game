@@ -117,6 +117,49 @@ router.get('/debug-dates', validateCronSecret, async (req, res) => {
 });
 
 /**
+ * GET /api/cron/debug-reading/:stationId/:date
+ * Check a specific reading's data
+ */
+router.get('/debug-reading/:stationId/:date', validateCronSecret, async (req, res) => {
+  try {
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+
+    const { stationId, date } = req.params;
+    const readingDate = new Date(date);
+
+    const reading = await prisma.stationReading.findUnique({
+      where: {
+        stationId_readingDate: {
+          stationId,
+          readingDate
+        }
+      }
+    });
+
+    if (!reading) {
+      return res.json({ error: 'Reading not found', stationId, date });
+    }
+
+    res.json({
+      reading: {
+        stationId: reading.stationId,
+        date: reading.readingDate.toISOString().split('T')[0],
+        maxTempRaw: Number(reading.maxTempRaw),
+        maxTempRounded: reading.maxTempRounded,
+        minTempRaw: Number(reading.minTempRaw),
+        minTempRounded: reading.minTempRounded,
+        windGustMax: Number(reading.windGustMax),
+        precipTotal: Number(reading.precipTotal),
+        precipRange: reading.precipRange
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * GET /api/cron/health
  * Check cron service health
  */
