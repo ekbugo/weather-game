@@ -105,14 +105,25 @@ function History() {
                     <div>
                       <p className="font-semibold text-gray-900">
                         {(() => {
-                          const dateStr = score.date.split('T')[0]; // Extract YYYY-MM-DD from ISO string
-                          const [year, month, day] = dateStr.split('-');
-                          return new Date(year, month - 1, day).toLocaleDateString('es-PR', {
-                            weekday: 'short',
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          });
+                          try {
+                            if (!score.date) return 'No date';
+                            const dateStr = String(score.date).split('T')[0];
+                            const [year, month, day] = dateStr.split('-');
+                            const parsedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                            if (isNaN(parsedDate.getTime())) {
+                              console.error('Invalid date created:', { date: score.date, dateStr, year, month, day });
+                              return 'Invalid Date';
+                            }
+                            return parsedDate.toLocaleDateString('es-PR', {
+                              weekday: 'short',
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            });
+                          } catch (e) {
+                            console.error('Date formatting error:', e, score.date);
+                            return 'Error';
+                          }
                         })()}
                       </p>
                       <p className="text-sm text-gray-500">{score.station.name}</p>
