@@ -1,25 +1,19 @@
 {
   "schedule": [
-    {
-      "weekStart": "2025-12-08",
-      "stationId": "IMAYAG30",
-      "notes": "Mayagüez Station - Week of Dec 8-14"
-    },
-    {
-      "weekStart": "2025-12-15",
-      "stationId": "ICAYEY43",
-      "notes": "Cayey Station - Week of Dec 15-21"
-    },
-    {
-      "weekStart": "2025-12-22",
-      "stationId": "IAGUAD73",
-      "notes": "Aguadilla Station - Week of Dec 22-28"
-    },
-    {
-      "weekStart": "2025-12-29",
-      "stationId": "ICABOR73",
-      "notes": "Cabo Rojo Station - Week of Dec 29 - Jan 4"
-    }
+    { "date": "2025-12-08", "stationId": "IMAYAG30", "notes": "Mayagüez" },
+    { "date": "2025-12-09", "stationId": "IMAYAG30", "notes": "Mayagüez" },
+    { "date": "2025-12-10", "stationId": "IMAYAG30", "notes": "Mayagüez" },
+    { "date": "2025-12-11", "stationId": "IMAYAG30", "notes": "Mayagüez" },
+    { "date": "2025-12-12", "stationId": "IMAYAG30", "notes": "Mayagüez" },
+    { "date": "2025-12-13", "stationId": "IMAYAG30", "notes": "Mayagüez" },
+    { "date": "2025-12-14", "stationId": "IMAYAG30", "notes": "Mayagüez" },
+    { "date": "2025-12-15", "stationId": "ICAYEY43", "notes": "Cayey" },
+    { "date": "2025-12-16", "stationId": "ICAYEY43", "notes": "Cayey" },
+    { "date": "2025-12-17", "stationId": "ICAYEY43", "notes": "Cayey" },
+    { "date": "2025-12-18", "stationId": "ICAYEY43", "notes": "Cayey" },
+    { "date": "2025-12-19", "stationId": "ICAYEY43", "notes": "Cayey" },
+    { "date": "2025-12-20", "stationId": "ICAYEY43", "notes": "Cayey" },
+    { "date": "2025-12-21", "stationId": "ICAYEY43", "notes": "Cayey" }
   ],
-  "_instructions": "Edit this file to change the weekly station schedule. Each week starts on Monday. If a station goes offline, simply change the stationId to another station. Valid stationIds: IMAYAG30, ICAYEY43, IAGUAD73, ICABOR73"
+  "_instructions": "Edit this file to change the daily station schedule. Each entry is for a specific forecast date. If a station goes offline, simply change the stationId for that date. Valid stationIds: IMAYAG30, ICAYEY43, IAGUAD73, ICABOR73"
 }
