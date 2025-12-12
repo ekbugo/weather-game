@@ -1,6 +1,6 @@
 {
-    "MaxTemp": null,
-    "MinTemp": null,
-    "MaxGust": null,
-    "SumPrec": null
+    "MaxTemp": 85,
+    "MinTemp": 72,
+    "MaxGust": 11,
+    "SumPrec": 0.2
 }
