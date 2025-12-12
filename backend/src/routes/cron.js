@@ -275,6 +275,102 @@ router.get('/debug-scores/:username', validateCronSecret, async (req, res) => {
 });
 
 /**
+ * POST/GET /api/cron/reimport-reading/:stationId/:date
+ * Delete and re-import a specific reading from JSON file
+ */
+router.all('/reimport-reading/:stationId/:date', validateCronSecret, async (req, res) => {
+  try {
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+    const fs = require('fs');
+    const path = require('path');
+
+    const { stationId, date } = req.params;
+    const readingDate = new Date(date);
+
+    console.log(`🔄 Re-importing reading for ${stationId} on ${date}`);
+
+    // Delete existing reading (this will cascade delete related scores)
+    const deleted = await prisma.stationReading.deleteMany({
+      where: {
+        stationId,
+        readingDate
+      }
+    });
+
+    console.log(`🗑️  Deleted ${deleted.count} existing reading(s)`);
+
+    // Re-import from JSON file
+    const dataDir = path.join(__dirname, '../../data');
+    const fileName = `${stationId}_${date}.json`;
+    const filePath = path.join(dataDir, fileName);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({
+        error: 'JSON file not found',
+        expectedFile: fileName,
+        path: filePath
+      });
+    }
+
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    // Calculate precipitation range (1-7)
+    const precipTotal = Number(data.SumPrec) || 0;
+    let precipRange;
+    if (precipTotal === 0) precipRange = 1;
+    else if (precipTotal < 0.10) precipRange = 2;
+    else if (precipTotal < 0.25) precipRange = 3;
+    else if (precipTotal < 0.50) precipRange = 4;
+    else if (precipTotal < 1.00) precipRange = 5;
+    else if (precipTotal < 2.00) precipRange = 6;
+    else precipRange = 7;
+
+    // Create new reading
+    const reading = await prisma.stationReading.create({
+      data: {
+        stationId,
+        readingDate,
+        maxTempRaw: Number(data.MaxTemp),
+        maxTempRounded: Math.round(Number(data.MaxTemp)),
+        minTempRaw: Number(data.MinTemp),
+        minTempRounded: Math.round(Number(data.MinTemp)),
+        windGustMax: Number(data.MaxGust),
+        precipTotal,
+        precipRange
+      }
+    });
+
+    console.log(`✅ Re-imported reading successfully`);
+
+    res.json({
+      success: true,
+      message: `Reading re-imported for ${stationId} on ${date}`,
+      deleted: deleted.count,
+      reading: {
+        stationId: reading.stationId,
+        date: reading.readingDate.toISOString().split('T')[0],
+        maxTempRaw: Number(reading.maxTempRaw),
+        maxTempRounded: reading.maxTempRounded,
+        minTempRaw: Number(reading.minTempRaw),
+        minTempRounded: reading.minTempRounded,
+        windGustMax: Number(reading.windGustMax),
+        precipTotal: Number(reading.precipTotal),
+        precipRange: reading.precipRange
+      }
+    });
+
+  } catch (error) {
+    console.error('Reimport reading error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Reimport failed',
+      message: error.message
+    });
+  }
+});
+
+/**
  * GET /api/cron/health
  * Check cron service health
  */
