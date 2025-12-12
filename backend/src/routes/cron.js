@@ -1,5 +1,5 @@
 const express = require('express');
-const { calculateScores, importReadings } = require('../services/cronService');
+const { calculateScores, importReadings, recalculateScoresForDate } = require('../services/cronService');
 
 const router = express.Router();
 
@@ -61,6 +61,38 @@ router.all('/import-readings', validateCronSecret, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Import failed',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST/GET /api/cron/recalculate-date/:date
+ * Recalculate scores for a specific date (deletes and recreates)
+ */
+router.all('/recalculate-date/:date', validateCronSecret, async (req, res) => {
+  try {
+    const { date } = req.params;
+
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+    }
+
+    console.log(`🔄 Recalculating scores for ${date} via API`);
+
+    const results = await recalculateScoresForDate(date);
+
+    res.json({
+      success: true,
+      message: `Scores recalculated for ${date}`,
+      results
+    });
+  } catch (error) {
+    console.error('Recalculate scores error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Recalculation failed',
       message: error.message
     });
   }
