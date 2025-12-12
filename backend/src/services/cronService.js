@@ -236,7 +236,32 @@ async function importReadings() {
   return results;
 }
 
+/**
+ * Recalculate scores for a specific date (deletes existing scores first)
+ */
+async function recalculateScoresForDate(dateStr) {
+  console.log(`\n🔄 Recalculating scores for: ${dateStr}\n`);
+
+  const date = new Date(dateStr);
+
+  // Delete existing scores for this date
+  const deleted = await prisma.score.deleteMany({
+    where: { scoreDate: date }
+  });
+
+  console.log(`🗑️  Deleted ${deleted.count} existing score(s)`);
+
+  // Now calculate fresh scores
+  const results = await calculateScores();
+
+  return {
+    deleted: deleted.count,
+    ...results
+  };
+}
+
 module.exports = {
   calculateScores,
-  importReadings
+  importReadings,
+  recalculateScoresForDate
 };
