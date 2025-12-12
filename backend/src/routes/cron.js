@@ -290,15 +290,42 @@ router.all('/reimport-reading/:stationId/:date', validateCronSecret, async (req,
 
     console.log(`🔄 Re-importing reading for ${stationId} on ${date}`);
 
-    // Delete existing reading (this will cascade delete related scores)
-    const deleted = await prisma.stationReading.deleteMany({
+    // First, find the reading to get its ID
+    const existingReading = await prisma.stationReading.findUnique({
       where: {
-        stationId,
-        readingDate
+        stationId_readingDate: {
+          stationId,
+          readingDate
+        }
       }
     });
 
-    console.log(`🗑️  Deleted ${deleted.count} existing reading(s)`);
+    if (!existingReading) {
+      return res.status(404).json({
+        error: 'Reading not found in database',
+        stationId,
+        date
+      });
+    }
+
+    // Delete related scores first (to avoid foreign key constraint)
+    const deletedScores = await prisma.score.deleteMany({
+      where: { readingId: existingReading.id }
+    });
+
+    console.log(`🗑️  Deleted ${deletedScores.count} related score(s)`);
+
+    // Now delete the reading
+    const deletedReading = await prisma.stationReading.delete({
+      where: {
+        stationId_readingDate: {
+          stationId,
+          readingDate
+        }
+      }
+    });
+
+    console.log(`🗑️  Deleted reading`);
 
     // Re-import from JSON file
     const dataDir = path.join(__dirname, '../../data');
@@ -346,7 +373,7 @@ router.all('/reimport-reading/:stationId/:date', validateCronSecret, async (req,
     res.json({
       success: true,
       message: `Reading re-imported for ${stationId} on ${date}`,
-      deleted: deleted.count,
+      deletedScores: deletedScores.count,
       reading: {
         stationId: reading.stationId,
         date: reading.readingDate.toISOString().split('T')[0],
