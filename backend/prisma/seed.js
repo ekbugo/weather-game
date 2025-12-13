@@ -40,7 +40,7 @@ async function main() {
     {
       id: 'IARECI42',
       name: 'Arecibo Station',
-      locationDesc: 'Weather station located in Arecibo, Puerto Rico.',
+      locationDesc: 'Weather station located in Ar3cibo, Puerto Rico.',
       latitude: 18.47,
       longitude: -66.70,
       wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IARECI42'
