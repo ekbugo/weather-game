@@ -46,11 +46,14 @@ function Register() {
         formData.email,
         formData.username,
         formData.password,
-        i18n.language
+        i18n.language.substring(0, 2) // Extract just "en" or "es" from "en-US" or "es-ES"
       );
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || t('errors.server'));
+      const errorMsg = err.response?.data?.error ||
+                       err.response?.data?.errors?.[0]?.msg ||
+                       t('errors.server');
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
