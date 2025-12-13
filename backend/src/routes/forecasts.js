@@ -9,6 +9,8 @@ const {
   nowAST
 } = require('../utils/timeUtils');
 const { getPrecipRangeDescription } = require('../services/scoringService');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
 
@@ -79,17 +81,46 @@ router.post('/', authenticateToken, forecastValidation, async (req, res) => {
       });
     }
 
-    // Get current station for the week
-    const weekStart = getWeekStart(forecastDate);
-    const schedule = await prisma.weeklySchedule.findFirst({
-      where: {
-        weekStart: weekStart.toJSDate()
-      }
-    });
+    // Get current station for this date
+    // Try to read from config file first
+    const configPath = path.join(__dirname, '../../config/weekly-schedule.json');
+    let stationId = null;
 
-    if (!schedule) {
+    if (fs.existsSync(configPath)) {
+      try {
+        const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        const scheduleEntry = configData.schedule?.find(
+          entry => entry.date === forecastDate
+        );
+
+        if (scheduleEntry) {
+          stationId = scheduleEntry.stationId;
+          console.log(`📅 Using station from config file: ${stationId} for date ${forecastDate}`);
+        }
+      } catch (err) {
+        console.warn('⚠️ Failed to read config file, falling back to database:', err.message);
+      }
+    }
+
+    // If not found in config, fall back to database (weekly schedule)
+    if (!stationId) {
+      const weekStart = getWeekStart(forecastDate);
+      const schedule = await prisma.weeklySchedule.findFirst({
+        where: {
+          weekStart: weekStart.toJSDate()
+        }
+      });
+
+      if (schedule) {
+        stationId = schedule.stationId;
+        console.log(`📅 Using station from database: ${stationId} for week ${weekStart.toISODate()}`);
+      }
+    }
+
+    if (!stationId) {
       return res.status(400).json({
-        error: 'No station scheduled for this week'
+        error: 'No station scheduled for this date',
+        forecastDate
       });
     }
 
@@ -117,7 +148,7 @@ router.post('/', authenticateToken, forecastValidation, async (req, res) => {
     const forecast = await prisma.forecast.create({
       data: {
         userId,
-        stationId: schedule.stationId,
+        stationId: stationId,
         forecastDate: new Date(forecastDate),
         maxTemp,
         minTemp,
