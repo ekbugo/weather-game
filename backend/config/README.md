@@ -27,11 +27,14 @@ This file controls the daily assignment of weather stations. The system checks t
   - Example: `2025-12-13` means forecasts submitted on Dec 12 for Dec 13
 
 - **stationId**: The ID of the weather station to use
-  - Valid values: `IMAYAG30`, `ICAYEY43`, `IAGUAD73`, `ICABOR73`
+  - Can be any station ID that exists in your database
+  - No validation - the system will use whatever station ID you provide
 
 - **notes**: Optional description for your reference
 
-### Available Stations
+### Current Stations in Database
+
+These are the stations currently available. You can add more stations to the database and use them here.
 
 | Station ID | Name | Location |
 |------------|------|----------|
