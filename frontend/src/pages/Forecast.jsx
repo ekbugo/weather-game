@@ -25,10 +25,10 @@ function Forecast() {
   const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
-    maxTemp: 85,
-    minTemp: 72,
-    windGust: 15,
-    precipRange: 1
+    maxTemp: '', // Empty
+    minTemp: '', // Empty
+    windGust: '', // Empty
+    precipRange: 1 // Keep this - dropdown needs a default
   });
 
   useEffect(() => {
