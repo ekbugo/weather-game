@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import Forecast from './pages/Forecast';
 import Leaderboard from './pages/Leaderboard';
 import History from './pages/History';
+import UserProfile from './pages/UserProfile';
 import LoadingSpinner from './components/LoadingSpinner';
 
 // Protected route wrapper
@@ -64,6 +65,12 @@ function App() {
         } />
 
         <Route path="leaderboard" element={<Leaderboard />} />
+
+        <Route path="user/:username" element={
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        } />
 
         <Route path="history" element={
           <ProtectedRoute>

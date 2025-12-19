@@ -199,4 +199,155 @@ router.get('/date/:date', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/scores/user/:username
+ * Get specific user's score history (requires authentication)
+ */
+router.get('/user/:username', authenticateToken, async (req, res) => {
+  try {
+    const prisma = req.prisma;
+    const { username } = req.params;
+    const { limit = 10, offset = 0 } = req.query;
+
+    // Find the user by username
+    const targetUser = await prisma.user.findUnique({
+      where: { username },
+      select: {
+        id: true,
+        username: true,
+        totalPoints: true,
+        createdAt: true
+      }
+    });
+
+    if (!targetUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get user's rank on leaderboard
+    const higherRankedCount = await prisma.user.count({
+      where: {
+        totalPoints: {
+          gt: targetUser.totalPoints
+        }
+      }
+    });
+    const rank = higherRankedCount + 1;
+
+    // Calculate date 7 days ago
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    // Get scores from last 7 days
+    const scores = await prisma.score.findMany({
+      where: {
+        userId: targetUser.id,
+        scoreDate: {
+          gte: sevenDaysAgo
+        }
+      },
+      include: {
+        forecast: {
+          include: {
+            station: true
+          }
+        },
+        reading: true
+      },
+      orderBy: { scoreDate: 'desc' },
+      take: parseInt(limit),
+      skip: parseInt(offset)
+    });
+
+    const totalInRange = await prisma.score.count({
+      where: {
+        userId: targetUser.id,
+        scoreDate: {
+          gte: sevenDaysAgo
+        }
+      }
+    });
+
+    const formattedScores = scores.map(s => ({
+      id: s.id,
+      date: s.scoreDate,
+      station: {
+        id: s.forecast.station.id,
+        name: s.forecast.station.name
+      },
+      forecast: {
+        maxTemp: s.forecast.maxTemp,
+        minTemp: s.forecast.minTemp,
+        windGust: s.forecast.windGust,
+        precipRange: s.forecast.precipRange,
+        precipRangeDesc: getPrecipRangeDescription(s.forecast.precipRange).label
+      },
+      actual: {
+        maxTemp: s.reading.maxTempRounded,
+        minTemp: s.reading.minTempRounded,
+        windGust: Math.round(Number(s.reading.windGustMax)),
+        precipTotal: Number(s.reading.precipTotal),
+        precipRange: s.reading.precipRange,
+        precipRangeDesc: getPrecipRangeDescription(s.reading.precipRange).label
+      },
+      scores: {
+        maxTemp: {
+          score: s.maxTempScore,
+          diff: Math.abs(s.forecast.maxTemp - s.reading.maxTempRounded)
+        },
+        minTemp: {
+          score: s.minTempScore,
+          diff: Math.abs(s.forecast.minTemp - s.reading.minTempRounded)
+        },
+        windGust: {
+          score: s.windGustScore,
+          diff: Math.abs(s.forecast.windGust - Math.round(Number(s.reading.windGustMax)))
+        },
+        precip: {
+          score: s.precipScore,
+          rangeDiff: Math.abs(s.forecast.precipRange - s.reading.precipRange)
+        },
+        perfectBonus: s.perfectBonus,
+        total: s.totalScore
+      }
+    }));
+
+    // Calculate summary stats for all time
+    const userStats = await prisma.score.aggregate({
+      where: { userId: targetUser.id },
+      _sum: { totalScore: true },
+      _avg: { totalScore: true },
+      _count: true
+    });
+
+    const perfectCount = await prisma.score.count({
+      where: { userId: targetUser.id, perfectBonus: 5 }
+    });
+
+    res.json({
+      user: {
+        username: targetUser.username,
+        rank,
+        createdAt: targetUser.createdAt
+      },
+      scores: formattedScores,
+      summary: {
+        totalScores: userStats._count,
+        totalPoints: userStats._sum.totalScore || 0,
+        averageScore: Math.round((userStats._avg.totalScore || 0) * 10) / 10,
+        perfectForecasts: perfectCount
+      },
+      pagination: {
+        total: totalInRange,
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        hasMore: parseInt(offset) + scores.length < totalInRange
+      }
+    });
+  } catch (error) {
+    console.error('Get user scores error:', error);
+    res.status(500).json({ error: 'Failed to get user scores' });
+  }
+});
+
 module.exports = router;
