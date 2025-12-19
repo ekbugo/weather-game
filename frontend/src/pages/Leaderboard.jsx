@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { leaderboardAPI } from '../utils/api';
@@ -131,9 +132,12 @@ function Leaderboard() {
 
               {/* Username */}
               <div className="flex-1 ml-4">
-                <span className={`font-medium ${entry.rank <= 3 ? 'text-lg' : ''}`}>
+                <Link
+                  to={`/user/${entry.username}`}
+                  className={`font-medium hover:text-hurricane-600 hover:underline ${entry.rank <= 3 ? 'text-lg' : ''}`}
+                >
                   {entry.username}
-                </span>
+                </Link>
                 {entry.id === user?.id && (
                   <span className="ml-2 text-xs bg-hurricane-200 text-hurricane-700 px-2 py-0.5 rounded-full">
                     Tú
