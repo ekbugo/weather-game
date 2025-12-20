@@ -450,6 +450,128 @@ router.all('/recalculate-user-total/:username', validateCronSecret, async (req, 
 });
 
 /**
+ * POST/GET /api/cron/fix-precipitation-scores
+ * Fix all precipitation scores by re-importing and recalculating
+ */
+router.all('/fix-precipitation-scores', validateCronSecret, async (req, res) => {
+  try {
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+    const { getPrecipRange } = require('../services/scoringService');
+    const { calculateTotalScore } = require('../services/scoringService');
+    const fs = require('fs');
+    const path = require('path');
+
+    console.log('\n🔧 Starting precipitation scoring fix...');
+
+    // Step 1: Delete all readings
+    const readingsCount = await prisma.stationReading.deleteMany({});
+    console.log(`✅ Deleted ${readingsCount.count} readings`);
+
+    // Step 2: Delete all scores
+    const scoresCount = await prisma.score.deleteMany({});
+    console.log(`✅ Deleted ${scoresCount.count} scores`);
+
+    // Step 3: Reset user points
+    const usersCount = await prisma.user.updateMany({
+      data: { totalPoints: 0 }
+    });
+    console.log(`✅ Reset ${usersCount.count} users to 0 points`);
+
+    // Step 4: Re-import readings
+    const dataDir = path.join(__dirname, '../../data');
+    const files = fs.readdirSync(dataDir).filter(f => f.endsWith('.json')).sort();
+    let imported = 0;
+
+    for (const file of files) {
+      const match = file.match(/^([A-Z0-9]+)_(\d{4}-\d{2}-\d{2})\.json$/);
+      if (!match) continue;
+
+      const [, stationId, dateStr] = match;
+      const data = JSON.parse(fs.readFileSync(path.join(dataDir, file), 'utf-8'));
+      const precipTotal = Number(data.SumPrec) || 0;
+      const precipRange = getPrecipRange(precipTotal);
+
+      await prisma.stationReading.create({
+        data: {
+          stationId,
+          readingDate: new Date(dateStr),
+          maxTempRaw: Number(data.MaxTemp),
+          maxTempRounded: Math.round(Number(data.MaxTemp)),
+          minTempRaw: Number(data.MinTemp),
+          minTempRounded: Math.round(Number(data.MinTemp)),
+          windGustMax: Number(data.MaxGust),
+          precipTotal,
+          precipRange
+        }
+      });
+      imported++;
+    }
+    console.log(`✅ Re-imported ${imported} readings`);
+
+    // Step 5: Recalculate scores
+    const readings = await prisma.stationReading.findMany({});
+    let recalculated = 0;
+
+    for (const reading of readings) {
+      const forecasts = await prisma.forecast.findMany({
+        where: {
+          stationId: reading.stationId,
+          forecastDate: reading.readingDate
+        },
+        include: { user: true }
+      });
+
+      for (const forecast of forecasts) {
+        const scoreResult = calculateTotalScore(forecast, reading);
+        await prisma.score.create({
+          data: {
+            userId: forecast.userId,
+            forecastId: forecast.id,
+            readingId: reading.id,
+            scoreDate: reading.readingDate,
+            maxTempScore: scoreResult.maxTempScore,
+            minTempScore: scoreResult.minTempScore,
+            windGustScore: scoreResult.windGustScore,
+            precipScore: scoreResult.precipScore,
+            perfectBonus: scoreResult.perfectBonus,
+            totalScore: scoreResult.totalScore
+          }
+        });
+
+        await prisma.user.update({
+          where: { id: forecast.userId },
+          data: { totalPoints: { increment: scoreResult.totalScore } }
+        });
+        recalculated++;
+      }
+    }
+
+    console.log(`✅ Recalculated ${recalculated} scores`);
+    await prisma.$disconnect();
+
+    res.json({
+      success: true,
+      message: 'Precipitation scoring fix completed',
+      results: {
+        deletedReadings: readingsCount.count,
+        deletedScores: scoresCount.count,
+        resetUsers: usersCount.count,
+        reimportedReadings: imported,
+        recalculatedScores: recalculated
+      }
+    });
+  } catch (error) {
+    console.error('Fix error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Fix failed',
+      message: error.message
+    });
+  }
+});
+
+/**
  * GET /api/cron/health
  * Check cron service health
  */
