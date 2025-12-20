@@ -23,31 +23,31 @@ const prisma = new PrismaClient();
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
 
 /**
- * Step 1: Delete all existing station readings
- */
-async function deleteAllReadings() {
-  console.log('\n🗑️  Step 1: Deleting all existing station readings...');
-
-  const count = await prisma.stationReading.count();
-  console.log(`   Found ${count} existing reading(s)`);
-
-  const result = await prisma.stationReading.deleteMany({});
-  console.log(`   ✅ Deleted ${result.count} reading(s)`);
-
-  return result.count;
-}
-
-/**
- * Step 2: Delete all existing scores
+ * Step 1: Delete all existing scores (must be first due to foreign key constraints)
  */
 async function deleteAllScores() {
-  console.log('\n🗑️  Step 2: Deleting all existing scores...');
+  console.log('\n🗑️  Step 1: Deleting all existing scores...');
 
   const count = await prisma.score.count();
   console.log(`   Found ${count} existing score(s)`);
 
   const result = await prisma.score.deleteMany({});
   console.log(`   ✅ Deleted ${result.count} score(s)`);
+
+  return result.count;
+}
+
+/**
+ * Step 2: Delete all existing station readings
+ */
+async function deleteAllReadings() {
+  console.log('\n🗑️  Step 2: Deleting all existing station readings...');
+
+  const count = await prisma.stationReading.count();
+  console.log(`   Found ${count} existing reading(s)`);
+
+  const result = await prisma.stationReading.deleteMany({});
+  console.log(`   ✅ Deleted ${result.count} reading(s)`);
 
   return result.count;
 }
@@ -256,8 +256,8 @@ async function main() {
   console.log('  FIX PRECIPITATION SCORING BUG');
   console.log('========================================');
   console.log('\nThis script will:');
-  console.log('  1. Delete all existing station readings');
-  console.log('  2. Delete all existing scores');
+  console.log('  1. Delete all existing scores');
+  console.log('  2. Delete all existing station readings');
   console.log('  3. Reset all user totalPoints to zero');
   console.log('  4. Re-import all weather readings with correct precipRange');
   console.log('  5. Recalculate all scores');
@@ -267,8 +267,8 @@ async function main() {
   await new Promise(resolve => setTimeout(resolve, 3000));
 
   try {
-    const step1 = await deleteAllReadings();
-    const step2 = await deleteAllScores();
+    const step1 = await deleteAllScores();
+    const step2 = await deleteAllReadings();
     const step3 = await resetUserPoints();
     const step4 = await reimportAllReadings();
     const step5 = await recalculateAllScores();
@@ -277,8 +277,8 @@ async function main() {
     console.log('  ✅ COMPLETE!');
     console.log('========================================');
     console.log('\nSummary:');
-    console.log(`  Deleted readings: ${step1}`);
-    console.log(`  Deleted scores: ${step2}`);
+    console.log(`  Deleted scores: ${step1}`);
+    console.log(`  Deleted readings: ${step2}`);
     console.log(`  Reset users: ${step3}`);
     console.log(`  Re-imported readings: ${step4.imported}`);
     console.log(`  Recalculated scores: ${step5.calculated}`);

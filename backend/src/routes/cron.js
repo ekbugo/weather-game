@@ -464,13 +464,13 @@ router.all('/fix-precipitation-scores', validateCronSecret, async (req, res) => 
 
     console.log('\n🔧 Starting precipitation scoring fix...');
 
-    // Step 1: Delete all readings
-    const readingsCount = await prisma.stationReading.deleteMany({});
-    console.log(`✅ Deleted ${readingsCount.count} readings`);
-
-    // Step 2: Delete all scores
+    // Step 1: Delete all scores (must be first due to foreign key constraints)
     const scoresCount = await prisma.score.deleteMany({});
     console.log(`✅ Deleted ${scoresCount.count} scores`);
+
+    // Step 2: Delete all readings (can only delete after scores are removed)
+    const readingsCount = await prisma.stationReading.deleteMany({});
+    console.log(`✅ Deleted ${readingsCount.count} readings`);
 
     // Step 3: Reset user points
     const usersCount = await prisma.user.updateMany({
