@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { calculateTotalScore } = require('./scoringService');
+const { calculateTotalScore, getPrecipRange } = require('./scoringService');
 const fs = require('fs');
 const path = require('path');
 
@@ -195,14 +195,7 @@ async function importReadings() {
 
       // Calculate precipitation range (1-7)
       const precipTotal = Number(data.SumPrec) || 0;
-      let precipRange;
-      if (precipTotal === 0) precipRange = 1;
-      else if (precipTotal < 0.10) precipRange = 2;
-      else if (precipTotal < 0.25) precipRange = 3;
-      else if (precipTotal < 0.50) precipRange = 4;
-      else if (precipTotal < 1.00) precipRange = 5;
-      else if (precipTotal < 2.00) precipRange = 6;
-      else precipRange = 7;
+      const precipRange = getPrecipRange(precipTotal);
 
       // Create station reading
       await prisma.stationReading.create({

@@ -9,6 +9,7 @@
     "build": "npx prisma generate",
     "import-readings": "node scripts/importReadings.js",
     "calculate-scores": "node scripts/calculateScores.js",
+    "fix-precipitation-scores": "node scripts/fixPrecipitationScores.js",
     "db:migrate": "npx prisma migrate dev",
     "db:seed": "npx prisma db seed",
     "db:studio": "npx prisma studio"
