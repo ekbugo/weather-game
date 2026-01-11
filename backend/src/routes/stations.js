@@ -27,19 +27,26 @@ router.get('/', async (req, res) => {
 /**
  * GET /api/stations/current
  * Get the current active station for today's forecast
- * Reads from config/weekly-schedule.json first, then falls back to database
+ * Reads ONLY from config/weekly-schedule.json (database fallback removed)
  */
 router.get('/current', async (req, res) => {
   try {
     const prisma = req.prisma;
 
     // Get the current forecast date (tomorrow's date if before 5pm)
+    const now = nowAST();
     const forecastDate = getCurrentForecastDate();
+
+    console.log('=== GET /api/stations/current DEBUG ===');
+    console.log(`Current AST time: ${now.toISO()}`);
+    console.log(`Current AST hour: ${now.hour}`);
+    console.log(`Forecast date: ${forecastDate}`);
 
     if (!forecastDate) {
       // After 5pm - submissions are closed
-      const now = nowAST();
       const nextForecastDate = now.plus({ days: 2 }).toISODate();
+      console.log('⏰ After 5pm - submissions closed');
+      console.log(`Next forecast date: ${nextForecastDate}`);
 
       return res.json({
         station: null,
@@ -54,59 +61,62 @@ router.get('/current', async (req, res) => {
     let stationId = null;
     let source = 'database';
 
+    console.log(`Config path: ${configPath}`);
+    console.log(`Config exists: ${fs.existsSync(configPath)}`);
+
     if (fs.existsSync(configPath)) {
       try {
         const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        console.log(`Config entries count: ${configData.schedule?.length || 0}`);
+
         const scheduleEntry = configData.schedule?.find(
           entry => entry.date === forecastDate
         );
 
+        console.log(`Schedule entry for ${forecastDate}:`, scheduleEntry || 'NOT FOUND');
+
         if (scheduleEntry) {
           stationId = scheduleEntry.stationId;
           source = 'config';
-          console.log(`📅 Using station from config file: ${stationId} for date ${forecastDate}`);
+          console.log(`✅ Using station from config file: ${stationId} for date ${forecastDate}`);
+        } else {
+          console.log(`⚠️ No config entry found for ${forecastDate}`);
         }
       } catch (err) {
-        console.warn('⚠️ Failed to read config file, falling back to database:', err.message);
+        console.warn('⚠️ Failed to read config file:', err.message);
       }
+    } else {
+      console.log('⚠️ Config file does not exist');
     }
 
-    // If not found in config, fall back to database (weekly schedule)
+    // If not found in config, return error (do NOT fall back to database)
     if (!stationId) {
-      const weekStart = getWeekStart(new Date(forecastDate));
-      const schedule = await prisma.weeklySchedule.findFirst({
-        where: {
-          weekStart: weekStart.toJSDate()
-        },
-        include: {
-          station: true
-        }
-      });
-
-      if (schedule) {
-        stationId = schedule.stationId;
-        console.log(`📅 Using station from database: ${stationId} for week ${weekStart.toISODate()}`);
-      }
-    }
-
-    // Get the station details
-    if (!stationId) {
+      console.log(`❌ No station scheduled in config for date ${forecastDate}`);
+      console.log('⚠️ Database fallback has been disabled - config file is the single source of truth');
       return res.status(404).json({
-        error: 'No station scheduled for this date',
-        forecastDate
+        error: 'No station scheduled for this date. Please ensure weekly-schedule.json is up to date.',
+        forecastDate,
+        message: 'The weekly schedule configuration file does not have an entry for this date.'
       });
     }
+
+    console.log(`🔍 Looking up station details for: ${stationId}`);
 
     const station = await prisma.station.findUnique({
       where: { id: stationId }
     });
 
     if (!station) {
+      console.log(`❌ Station ${stationId} not found in database`);
       return res.status(404).json({
         error: 'Station not found',
         stationId
       });
     }
+
+    console.log(`✅ Returning station: ${station.name} (${station.id})`);
+    console.log(`Source: ${source}`);
+    console.log('=== END DEBUG ===\n');
 
     res.json({
       station,
