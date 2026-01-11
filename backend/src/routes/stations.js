@@ -6,6 +6,55 @@ const path = require('path');
 const router = express.Router();
 
 /**
+ * GET /api/stations/debug
+ * Debug endpoint to check config file status
+ */
+router.get('/debug', (req, res) => {
+  const configPath = path.join(__dirname, '../../config/weekly-schedule.json');
+  const now = nowAST();
+  const forecastDate = getCurrentForecastDate();
+
+  const debug = {
+    currentTime: now.toISO(),
+    currentHour: now.hour,
+    forecastDate: forecastDate,
+    timezone: now.zoneName,
+    offset: now.offset,
+    __dirname: __dirname,
+    cwd: process.cwd(),
+    configPath: configPath,
+    configExists: fs.existsSync(configPath),
+    configDirExists: fs.existsSync(path.join(__dirname, '../../config')),
+    configDirContents: null,
+    configFileSize: null,
+    configData: null
+  };
+
+  try {
+    if (fs.existsSync(path.join(__dirname, '../../config'))) {
+      debug.configDirContents = fs.readdirSync(path.join(__dirname, '../../config'));
+    }
+  } catch (err) {
+    debug.configDirError = err.message;
+  }
+
+  try {
+    if (fs.existsSync(configPath)) {
+      const stats = fs.statSync(configPath);
+      debug.configFileSize = stats.size;
+      const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+      debug.configEntriesCount = configData.schedule?.length || 0;
+      debug.hasForecastDate = configData.schedule?.some(e => e.date === forecastDate);
+      debug.forecastDateEntry = configData.schedule?.find(e => e.date === forecastDate);
+    }
+  } catch (err) {
+    debug.configReadError = err.message;
+  }
+
+  res.json(debug);
+});
+
+/**
  * GET /api/stations
  * Get all weather stations
  */
