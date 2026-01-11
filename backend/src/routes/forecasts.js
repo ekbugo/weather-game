@@ -95,32 +95,25 @@ router.post('/', authenticateToken, forecastValidation, async (req, res) => {
 
         if (scheduleEntry) {
           stationId = scheduleEntry.stationId;
-          console.log(`📅 Using station from config file: ${stationId} for date ${forecastDate}`);
+          console.log(`✅ Using station from config file: ${stationId} for date ${forecastDate}`);
+        } else {
+          console.log(`⚠️ No config entry found for ${forecastDate}`);
         }
       } catch (err) {
-        console.warn('⚠️ Failed to read config file, falling back to database:', err.message);
+        console.warn('⚠️ Failed to read config file:', err.message);
       }
+    } else {
+      console.log('⚠️ Config file does not exist');
     }
 
-    // If not found in config, fall back to database (weekly schedule)
+    // If not found in config, return error (do NOT fall back to database)
     if (!stationId) {
-      const weekStart = getWeekStart(forecastDate);
-      const schedule = await prisma.weeklySchedule.findFirst({
-        where: {
-          weekStart: weekStart.toJSDate()
-        }
-      });
-
-      if (schedule) {
-        stationId = schedule.stationId;
-        console.log(`📅 Using station from database: ${stationId} for week ${weekStart.toISODate()}`);
-      }
-    }
-
-    if (!stationId) {
+      console.log(`❌ No station scheduled in config for date ${forecastDate}`);
+      console.log('⚠️ Database fallback has been disabled - config file is the single source of truth');
       return res.status(400).json({
-        error: 'No station scheduled for this date',
-        forecastDate
+        error: 'No station scheduled for this date. Please ensure weekly-schedule.json is up to date.',
+        forecastDate,
+        message: 'The weekly schedule configuration file does not have an entry for this date.'
       });
     }
 

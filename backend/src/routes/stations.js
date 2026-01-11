@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
 /**
  * GET /api/stations/current
  * Get the current active station for today's forecast
- * Reads from config/weekly-schedule.json first, then falls back to database
+ * Reads ONLY from config/weekly-schedule.json (database fallback removed)
  */
 router.get('/current', async (req, res) => {
   try {
@@ -80,46 +80,23 @@ router.get('/current', async (req, res) => {
           source = 'config';
           console.log(`✅ Using station from config file: ${stationId} for date ${forecastDate}`);
         } else {
-          console.log(`⚠️ No config entry found for ${forecastDate}, will fall back to database`);
+          console.log(`⚠️ No config entry found for ${forecastDate}`);
         }
       } catch (err) {
-        console.warn('⚠️ Failed to read config file, falling back to database:', err.message);
+        console.warn('⚠️ Failed to read config file:', err.message);
       }
     } else {
-      console.log('⚠️ Config file does not exist, falling back to database');
+      console.log('⚠️ Config file does not exist');
     }
 
-    // If not found in config, fall back to database (weekly schedule)
+    // If not found in config, return error (do NOT fall back to database)
     if (!stationId) {
-      console.log('🔄 Falling back to database...');
-      const weekStart = getWeekStart(new Date(forecastDate));
-      console.log(`Week start for ${forecastDate}: ${weekStart.toISODate()}`);
-
-      const schedule = await prisma.weeklySchedule.findFirst({
-        where: {
-          weekStart: weekStart.toJSDate()
-        },
-        include: {
-          station: true
-        }
-      });
-
-      console.log('Database schedule result:', schedule);
-
-      if (schedule) {
-        stationId = schedule.stationId;
-        console.log(`✅ Using station from database: ${stationId} for week ${weekStart.toISODate()}`);
-      } else {
-        console.log(`❌ No database schedule found for week ${weekStart.toISODate()}`);
-      }
-    }
-
-    // Get the station details
-    if (!stationId) {
-      console.log(`❌ No station found for date ${forecastDate}`);
+      console.log(`❌ No station scheduled in config for date ${forecastDate}`);
+      console.log('⚠️ Database fallback has been disabled - config file is the single source of truth');
       return res.status(404).json({
-        error: 'No station scheduled for this date',
-        forecastDate
+        error: 'No station scheduled for this date. Please ensure weekly-schedule.json is up to date.',
+        forecastDate,
+        message: 'The weekly schedule configuration file does not have an entry for this date.'
       });
     }
 
