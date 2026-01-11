@@ -35,7 +35,18 @@ const forecastValidation = [
  * Get current submission window status
  */
 router.get('/status', (req, res) => {
+  const now = nowAST();
+  const forecastDate = getCurrentForecastDate();
+
+  console.log('=== GET /api/forecasts/status DEBUG ===');
+  console.log(`Current AST time: ${now.toISO()}`);
+  console.log(`Current AST hour: ${now.hour}`);
+  console.log(`Forecast date: ${forecastDate}`);
+  console.log(`Timezone: ${now.zoneName}, Offset: ${now.offset}`);
+
   const window = getSubmissionWindow();
+  console.log(`Window isOpen: ${window.isOpen}`);
+  console.log('=== END DEBUG ===\n');
 
   // Add precipitation range descriptions for the form
   const precipRanges = [1, 2, 3, 4, 5, 6, 7].map(range => ({
@@ -46,7 +57,7 @@ router.get('/status', (req, res) => {
   res.json({
     ...window,
     precipRanges,
-    currentTime: nowAST().toISO()
+    currentTime: now.toISO()
   });
 });
 
