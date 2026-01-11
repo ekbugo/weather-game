@@ -11,8 +11,71 @@ const {
 const { getPrecipRangeDescription } = require('../services/scoringService');
 const fs = require('fs');
 const path = require('path');
+const { DateTime } = require('luxon');
 
 const router = express.Router();
+
+/**
+ * Helper function to find the next scheduled forecast date from config
+ * @param {string} afterDate - ISO date string to search after (exclusive)
+ * @returns {object|null} - { date, stationId, opensAt } or null if none found
+ */
+function findNextScheduledForecast(afterDate) {
+  const configPath = path.join(__dirname, '../../config/weekly-schedule.json');
+
+  if (!fs.existsSync(configPath)) {
+    return null;
+  }
+
+  try {
+    const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+
+    // Find all dates after the given date, sorted chronologically
+    const futureDates = configData.schedule
+      ?.filter(entry => entry.date > afterDate)
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    if (!futureDates || futureDates.length === 0) {
+      return null;
+    }
+
+    const nextEntry = futureDates[0];
+
+    // Calculate when submissions open (midnight on the day before)
+    const forecastDate = DateTime.fromISO(nextEntry.date, { zone: 'America/Puerto_Rico' });
+    const opensAt = forecastDate.minus({ days: 1 }).startOf('day');
+
+    return {
+      date: nextEntry.date,
+      stationId: nextEntry.stationId,
+      opensAt: opensAt.toISO()
+    };
+  } catch (err) {
+    console.error('Error finding next forecast:', err);
+    return null;
+  }
+}
+
+/**
+ * Check if a forecast is scheduled for a specific date
+ * @param {string} date - ISO date string
+ * @returns {boolean}
+ */
+function isForecastScheduled(date) {
+  const configPath = path.join(__dirname, '../../config/weekly-schedule.json');
+
+  if (!fs.existsSync(configPath)) {
+    return false;
+  }
+
+  try {
+    const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    return configData.schedule?.some(entry => entry.date === date) || false;
+  } catch (err) {
+    console.error('Error checking forecast schedule:', err);
+    return false;
+  }
+}
 
 // Validation for forecast submission
 const forecastValidation = [
@@ -44,15 +107,59 @@ router.get('/status', (req, res) => {
   console.log(`Forecast date: ${forecastDate}`);
   console.log(`Timezone: ${now.zoneName}, Offset: ${now.offset}`);
 
-  const window = getSubmissionWindow();
-  console.log(`Window isOpen: ${window.isOpen}`);
-  console.log('=== END DEBUG ===\n');
-
   // Add precipitation range descriptions for the form
   const precipRanges = [1, 2, 3, 4, 5, 6, 7].map(range => ({
     value: range,
     ...getPrecipRangeDescription(range)
   }));
+
+  // Check if submissions are open based on time
+  if (!forecastDate) {
+    // After 5pm - window closed for today
+    console.log('⏰ After 5pm - window closed');
+    const today = now.toISODate();
+    const nextForecast = findNextScheduledForecast(today);
+
+    console.log(`Next forecast:`, nextForecast);
+    console.log('=== END DEBUG ===\n');
+
+    return res.json({
+      isOpen: false,
+      reason: 'window_closed',
+      message: 'Forecast submissions are closed for today.',
+      nextForecast: nextForecast || undefined,
+      precipRanges,
+      currentTime: now.toISO()
+    });
+  }
+
+  // Check if a forecast is actually scheduled for this date
+  const isScheduled = isForecastScheduled(forecastDate);
+  console.log(`Forecast scheduled for ${forecastDate}: ${isScheduled}`);
+
+  if (!isScheduled) {
+    // No forecast scheduled for tomorrow
+    console.log('❌ No forecast scheduled for tomorrow');
+    const nextForecast = findNextScheduledForecast(forecastDate);
+
+    console.log(`Next forecast:`, nextForecast);
+    console.log('=== END DEBUG ===\n');
+
+    return res.json({
+      isOpen: false,
+      reason: 'no_forecast_scheduled',
+      message: `No forecast scheduled for ${forecastDate}.`,
+      nextForecast: nextForecast || undefined,
+      precipRanges,
+      currentTime: now.toISO()
+    });
+  }
+
+  // Forecast is scheduled and time window is open
+  console.log('✅ Forecast window is open');
+  const window = getSubmissionWindow();
+  console.log(`Window closes at: ${window.closesAt}`);
+  console.log('=== END DEBUG ===\n');
 
   res.json({
     ...window,
