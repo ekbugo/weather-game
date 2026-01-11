@@ -34,12 +34,19 @@ router.get('/current', async (req, res) => {
     const prisma = req.prisma;
 
     // Get the current forecast date (tomorrow's date if before 5pm)
+    const now = nowAST();
     const forecastDate = getCurrentForecastDate();
+
+    console.log('=== GET /api/stations/current DEBUG ===');
+    console.log(`Current AST time: ${now.toISO()}`);
+    console.log(`Current AST hour: ${now.hour}`);
+    console.log(`Forecast date: ${forecastDate}`);
 
     if (!forecastDate) {
       // After 5pm - submissions are closed
-      const now = nowAST();
       const nextForecastDate = now.plus({ days: 2 }).toISODate();
+      console.log('⏰ After 5pm - submissions closed');
+      console.log(`Next forecast date: ${nextForecastDate}`);
 
       return res.json({
         station: null,
@@ -54,26 +61,40 @@ router.get('/current', async (req, res) => {
     let stationId = null;
     let source = 'database';
 
+    console.log(`Config path: ${configPath}`);
+    console.log(`Config exists: ${fs.existsSync(configPath)}`);
+
     if (fs.existsSync(configPath)) {
       try {
         const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        console.log(`Config entries count: ${configData.schedule?.length || 0}`);
+
         const scheduleEntry = configData.schedule?.find(
           entry => entry.date === forecastDate
         );
 
+        console.log(`Schedule entry for ${forecastDate}:`, scheduleEntry || 'NOT FOUND');
+
         if (scheduleEntry) {
           stationId = scheduleEntry.stationId;
           source = 'config';
-          console.log(`📅 Using station from config file: ${stationId} for date ${forecastDate}`);
+          console.log(`✅ Using station from config file: ${stationId} for date ${forecastDate}`);
+        } else {
+          console.log(`⚠️ No config entry found for ${forecastDate}, will fall back to database`);
         }
       } catch (err) {
         console.warn('⚠️ Failed to read config file, falling back to database:', err.message);
       }
+    } else {
+      console.log('⚠️ Config file does not exist, falling back to database');
     }
 
     // If not found in config, fall back to database (weekly schedule)
     if (!stationId) {
+      console.log('🔄 Falling back to database...');
       const weekStart = getWeekStart(new Date(forecastDate));
+      console.log(`Week start for ${forecastDate}: ${weekStart.toISODate()}`);
+
       const schedule = await prisma.weeklySchedule.findFirst({
         where: {
           weekStart: weekStart.toJSDate()
@@ -83,30 +104,42 @@ router.get('/current', async (req, res) => {
         }
       });
 
+      console.log('Database schedule result:', schedule);
+
       if (schedule) {
         stationId = schedule.stationId;
-        console.log(`📅 Using station from database: ${stationId} for week ${weekStart.toISODate()}`);
+        console.log(`✅ Using station from database: ${stationId} for week ${weekStart.toISODate()}`);
+      } else {
+        console.log(`❌ No database schedule found for week ${weekStart.toISODate()}`);
       }
     }
 
     // Get the station details
     if (!stationId) {
+      console.log(`❌ No station found for date ${forecastDate}`);
       return res.status(404).json({
         error: 'No station scheduled for this date',
         forecastDate
       });
     }
 
+    console.log(`🔍 Looking up station details for: ${stationId}`);
+
     const station = await prisma.station.findUnique({
       where: { id: stationId }
     });
 
     if (!station) {
+      console.log(`❌ Station ${stationId} not found in database`);
       return res.status(404).json({
         error: 'Station not found',
         stationId
       });
     }
+
+    console.log(`✅ Returning station: ${station.name} (${station.id})`);
+    console.log(`Source: ${source}`);
+    console.log('=== END DEBUG ===\n');
 
     res.json({
       station,
