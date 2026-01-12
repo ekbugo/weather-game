@@ -150,24 +150,63 @@ function Forecast() {
 
   // If submission window is closed
   if (!submissionStatus?.isOpen) {
+    const reason = submissionStatus?.reason;
+    const nextForecast = submissionStatus?.nextForecast;
+
+    // Determine the message based on the reason
+    let title, description;
+    if (reason === 'no_forecast_scheduled') {
+      title = 'No Forecast Today';
+      description = 'There is no forecast scheduled for tomorrow.';
+    } else if (reason === 'window_closed') {
+      title = t('forecast.closed');
+      description = 'Submissions closed at 5:00 PM AST today.';
+    } else {
+      title = t('forecast.closed');
+      description = t('forecast.opensAt') + ' 12:00 AM AST';
+    }
+
     return (
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-xl shadow-md p-8 text-center">
           <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {t('forecast.closed')}
+            {title}
           </h1>
           <p className="text-gray-500 mb-4">
-            {t('forecast.opensAt')} 12:00 AM AST
+            {description}
           </p>
 
-          {submissionStatus?.nextForecastDate && (
+          {nextForecast && (
             <div className="bg-hurricane-50 rounded-lg p-4">
-              <p className="text-hurricane-700">
-                Próximo pronóstico: <strong>{submissionStatus.nextForecastDate}</strong>
+              <p className="text-hurricane-700 font-semibold mb-2">
+                Next Forecast
               </p>
-              <p className="text-sm text-hurricane-600 mt-1">
-                La ventana abre en {submissionStatus.minutesUntilOpen} minutos
+              <p className="text-hurricane-900">
+                <strong>{new Date(nextForecast.date).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
+                })}</strong>
+              </p>
+              <p className="text-sm text-hurricane-600 mt-2">
+                Opens: {new Date(nextForecast.opensAt).toLocaleString('en-US', {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  timeZoneName: 'short'
+                })}
+              </p>
+            </div>
+          )}
+
+          {!nextForecast && reason === 'no_forecasts_available' && (
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-gray-700">
+                No upcoming forecasts are currently scheduled. Please check back later.
               </p>
             </div>
           )}

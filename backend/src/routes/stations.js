@@ -2,8 +2,50 @@ const express = require('express');
 const { getWeekStart, nowAST, getCurrentForecastDate } = require('../utils/timeUtils');
 const fs = require('fs');
 const path = require('path');
+const { DateTime } = require('luxon');
 
 const router = express.Router();
+
+/**
+ * Helper function to find the next scheduled forecast date from config
+ * @param {string} afterDate - ISO date string to search after (exclusive)
+ * @returns {object|null} - { date, stationId, opensAt } or null if none found
+ */
+function findNextScheduledForecast(afterDate) {
+  const configPath = path.join(__dirname, '../../config/weekly-schedule.json');
+
+  if (!fs.existsSync(configPath)) {
+    return null;
+  }
+
+  try {
+    const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+
+    // Find all dates after the given date, sorted chronologically
+    const futureDates = configData.schedule
+      ?.filter(entry => entry.date > afterDate)
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    if (!futureDates || futureDates.length === 0) {
+      return null;
+    }
+
+    const nextEntry = futureDates[0];
+
+    // Calculate when submissions open (midnight on the day before)
+    const forecastDate = DateTime.fromISO(nextEntry.date, { zone: 'America/Puerto_Rico' });
+    const opensAt = forecastDate.minus({ days: 1 }).startOf('day');
+
+    return {
+      date: nextEntry.date,
+      stationId: nextEntry.stationId,
+      opensAt: opensAt.toISO()
+    };
+  } catch (err) {
+    console.error('Error finding next forecast:', err);
+    return null;
+  }
+}
 
 /**
  * GET /api/stations/debug
@@ -92,17 +134,39 @@ router.get('/current', async (req, res) => {
     console.log(`Forecast date: ${forecastDate}`);
 
     if (!forecastDate) {
-      // After 5pm - submissions are closed
-      const nextForecastDate = now.plus({ days: 2 }).toISODate();
-      console.log('⏰ After 5pm - submissions closed');
-      console.log(`Next forecast date: ${nextForecastDate}`);
+      // After 5pm - submissions are closed for today
+      console.log('⏰ After 5pm - submissions closed for today');
+      console.log('🔍 Looking for next scheduled forecast...');
 
-      return res.json({
-        station: null,
-        forecastDate: nextForecastDate,
-        isOpen: false,
-        message: 'Submissions are closed. Opens at midnight AST.'
-      });
+      // Find the next scheduled forecast after today
+      const today = now.toISODate();
+      const nextForecast = findNextScheduledForecast(today);
+
+      if (nextForecast) {
+        console.log(`📅 Next forecast: ${nextForecast.date}, opens at ${nextForecast.opensAt}`);
+
+        return res.json({
+          station: null,
+          forecastDate: null,
+          isOpen: false,
+          reason: 'window_closed',
+          message: 'Forecast submissions are closed for today.',
+          nextForecast: {
+            date: nextForecast.date,
+            opensAt: nextForecast.opensAt,
+            stationId: nextForecast.stationId
+          }
+        });
+      } else {
+        console.log(`❌ No future forecasts found`);
+        return res.json({
+          station: null,
+          forecastDate: null,
+          isOpen: false,
+          reason: 'no_forecasts_available',
+          message: 'No upcoming forecasts scheduled.'
+        });
+      }
     }
 
     // Try to read from config file first
@@ -138,15 +202,36 @@ router.get('/current', async (req, res) => {
       console.log('⚠️ Config file does not exist');
     }
 
-    // If not found in config, return error (do NOT fall back to database)
+    // If not found in config, find the next scheduled forecast
     if (!stationId) {
       console.log(`❌ No station scheduled in config for date ${forecastDate}`);
-      console.log('⚠️ Database fallback has been disabled - config file is the single source of truth');
-      return res.status(404).json({
-        error: 'No station scheduled for this date. Please ensure weekly-schedule.json is up to date.',
-        forecastDate,
-        message: 'The weekly schedule configuration file does not have an entry for this date.'
-      });
+      console.log('🔍 Looking for next scheduled forecast...');
+
+      const nextForecast = findNextScheduledForecast(forecastDate);
+
+      if (nextForecast) {
+        console.log(`📅 Next forecast: ${nextForecast.date}, opens at ${nextForecast.opensAt}`);
+
+        return res.json({
+          station: null,
+          forecastDate: null,
+          isOpen: false,
+          reason: 'no_forecast_scheduled',
+          message: `No forecast scheduled for ${forecastDate}. Next forecast is for ${nextForecast.date}.`,
+          nextForecast: {
+            date: nextForecast.date,
+            opensAt: nextForecast.opensAt,
+            stationId: nextForecast.stationId
+          }
+        });
+      } else {
+        console.log(`❌ No future forecasts found in config`);
+        return res.status(404).json({
+          error: 'No forecasts scheduled',
+          message: 'There are no upcoming forecasts scheduled. Please check back later.',
+          reason: 'no_forecasts_available'
+        });
+      }
     }
 
     console.log(`🔍 Looking up station details for: ${stationId}`);
