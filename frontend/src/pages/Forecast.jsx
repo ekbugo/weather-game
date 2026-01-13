@@ -183,22 +183,31 @@ function Forecast() {
                 Next Forecast
               </p>
               <p className="text-hurricane-900">
-                <strong>{new Date(nextForecast.date).toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric'
-                })}</strong>
+                <strong>{(() => {
+                  // Parse date without timezone conversion
+                  const [year, month, day] = nextForecast.date.split('-').map(Number);
+                  const date = new Date(year, month - 1, day);
+                  return date.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                  });
+                })()}</strong>
               </p>
               <p className="text-sm text-hurricane-600 mt-2">
-                Opens: {new Date(nextForecast.opensAt).toLocaleString('en-US', {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  timeZoneName: 'short'
-                })}
+                Opens: {(() => {
+                  const opensDate = new Date(nextForecast.opensAt);
+                  return opensDate.toLocaleString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    timeZone: 'America/Puerto_Rico',
+                    timeZoneName: 'short'
+                  });
+                })()}
               </p>
             </div>
           )}
