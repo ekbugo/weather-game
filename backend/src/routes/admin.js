@@ -57,27 +57,55 @@ router.delete('/delete-all-scores', async (req, res) => {
 });
 
 /**
+ * DELETE /api/admin/delete-all-forecasts
+ * Delete all forecasts from the forecasts table
+ * WARNING: This is destructive and cannot be undone
+ */
+router.delete('/delete-all-forecasts', async (req, res) => {
+  try {
+    const prisma = req.prisma;
+
+    // Delete all forecasts
+    const result = await prisma.forecast.deleteMany({});
+
+    console.log(`✅ Deleted ${result.count} forecasts`);
+
+    res.json({
+      success: true,
+      message: `Deleted ${result.count} forecasts`,
+      forecastsDeleted: result.count
+    });
+  } catch (error) {
+    console.error('Delete forecasts error:', error);
+    res.status(500).json({ error: 'Failed to delete forecasts' });
+  }
+});
+
+/**
  * POST /api/admin/reset-everything
- * Reset both scores table and user totalPoints
- * WARNING: This will completely reset the leaderboard
+ * Delete all forecasts, scores, and reset user totalPoints
+ * WARNING: This will completely wipe all game data
  */
 router.post('/reset-everything', async (req, res) => {
   try {
     const prisma = req.prisma;
 
-    // Delete all scores and reset user points in a transaction
-    const [scoresDeleted, usersUpdated] = await prisma.$transaction([
+    // Delete all forecasts, scores and reset user points in a transaction
+    // Note: Scores must be deleted before forecasts due to foreign key constraint
+    const [scoresDeleted, forecastsDeleted, usersUpdated] = await prisma.$transaction([
       prisma.score.deleteMany({}),
+      prisma.forecast.deleteMany({}),
       prisma.user.updateMany({
         data: { totalPoints: 0 }
       })
     ]);
 
-    console.log(`✅ Deleted ${scoresDeleted.count} scores and reset ${usersUpdated.count} users`);
+    console.log(`✅ Deleted ${forecastsDeleted.count} forecasts, ${scoresDeleted.count} scores and reset ${usersUpdated.count} users`);
 
     res.json({
       success: true,
-      message: 'Successfully reset all scores and user points',
+      message: 'Successfully reset all forecasts, scores and user points',
+      forecastsDeleted: forecastsDeleted.count,
       scoresDeleted: scoresDeleted.count,
       usersUpdated: usersUpdated.count
     });
