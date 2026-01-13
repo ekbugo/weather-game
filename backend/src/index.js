@@ -10,6 +10,7 @@ const forecastRoutes = require('./routes/forecasts');
 const leaderboardRoutes = require('./routes/leaderboard');
 const scoreRoutes = require('./routes/scores');
 const cronRoutes = require('./routes/cron');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -37,6 +38,7 @@ app.use('/api/forecasts', forecastRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/scores', scoreRoutes);
 app.use('/api/cron', cronRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
