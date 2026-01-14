@@ -8,42 +8,74 @@ async function main() {
     {
       id: 'ICAYEY43',
       name: 'Cayey Station',
-      locationDesc: 'Weather station located in Cayey, Puerto Rico. Mountainous region with cooler temperatures.',
-      latitude: 18.1119,
-      longitude: -66.1660,
+      locationDesc: 'Weather station located in Cayey, Puerto Rico.',
+      latitude: 18.11,
+      longitude: -66.16,
       wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/ICAYEY43'
     },
     {
       id: 'IAGUAD73',
       name: 'Aguadilla Station',
-      locationDesc: 'Weather station located in Aguadilla, Puerto Rico. Coastal area in the northwest.',
-      latitude: 18.4274,
-      longitude: -67.1541,
+      locationDesc: 'Weather station located in Aguadilla, Puerto Rico.',
+      latitude: 18.42,
+      longitude: -67.15,
       wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IAGUAD73'
     },
     {
       id: 'IMAYAG30',
       name: 'Mayagüez Station',
-      locationDesc: 'Weather station located in Mayagüez, Puerto Rico. Western coastal city.',
-      latitude: 18.2013,
-      longitude: -67.1397,
+      locationDesc: 'Weather station located in Mayagüez, Puerto Rico.',
+      latitude: 18.20,
+      longitude: -67.13,
       wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IMAYAG30'
     },
     {
       id: 'ICABOR73',
       name: 'Cabo Rojo Station',
-      locationDesc: 'Weather station located in Cabo Rojo, Puerto Rico. Southwestern coastal area.',
-      latitude: 18.0866,
-      longitude: -67.1457,
+      locationDesc: 'Weather station located in Cabo Rojo, Puerto Rico.',
+      latitude: 18.08,
+      longitude: -67.14,
       wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/ICABOR73'
     },
     {
-      id: 'IARECI42',
+      id: 'IMARIC13',
+      name: 'Maricao Station',
+      locationDesc: 'Weather station located in Maricao, Puerto Rico.',
+      latitude: 18.15,
+      longitude: -66.88,
+      wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IMARIC13'
+    },
+    {
+      id: 'IVEGAB17',
+      name: 'Vega Baja Station',
+      locationDesc: 'Weather station located in Vega Baja, Puerto Rico.',
+      latitude: 18.45,
+      longitude: -66.38,
+      wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IVEGAB17'
+    },
+    {
+      id: 'ICULEB6',
+      name: 'Culebra Station',
+      locationDesc: 'Weather station located in Culebra, Puerto Rico.',
+      latitude: 18.31,
+      longitude: -65.30,
+      wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/ICULEB6'
+    },
+    {
+      id: 'IPONCE128',
+      name: 'Ponce Station',
+      locationDesc: 'Weather station located in Ponce, Puerto Rico.',
+      latitude: 17.98,
+      longitude: -66.66,
+      wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IPONCE128'
+    },
+    {
+      id: 'IARECI36',
       name: 'Arecibo Station',
-      locationDesc: 'Weather station located in Ar3cibo, Puerto Rico.',
-      latitude: 18.47,
-      longitude: -66.70,
-      wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IARECI42'
+      locationDesc: 'Weather station located in Arecibo, Puerto Rico.',
+      latitude: 18.46,
+      longitude: -66.74,
+      wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IARECI36'
     }
   ];
 
