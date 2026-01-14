@@ -43,8 +43,7 @@ export const authAPI = {
 export const stationAPI = {
   getAll: () => api.get('/stations'),
   getCurrent: () => api.get('/stations/current'),
-  getById: (id) => api.get(`/stations/${id}`),
-  getSchedule: () => api.get('/stations/schedule/upcoming')
+  getById: (id) => api.get(`/stations/${id}`)
 };
 
 // Forecast endpoints
