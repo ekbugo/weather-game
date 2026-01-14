@@ -78,6 +78,7 @@ Railway will automatically redeploy your backend.
    - Go to your repository on GitHub
    - Navigate to Settings → Pages
    - Under "Source", select "GitHub Actions"
+   - **Important**: Leave the "Custom domain" field empty to use the default `github.io` URL
 
 2. **Configure API URL Secret**
 
@@ -117,6 +118,47 @@ You can also trigger a manual deployment:
 1. Go to Actions tab on GitHub
 2. Select "Deploy to GitHub Pages"
 3. Click "Run workflow"
+
+### Using a Custom Domain (Optional)
+
+If you want to use a custom domain instead of `github.io`:
+
+1. **Add CNAME file**
+
+   Create a file named `CNAME` in the `frontend/public/` directory with your domain:
+   ```
+   app.huracaninfo.com
+   ```
+
+   (This file will be copied to the build output automatically)
+
+2. **Configure DNS**
+
+   Add these DNS records at your domain provider:
+   - For apex domain (`huracaninfo.com`): Add A records to GitHub's IPs
+   - For subdomain (`app.huracaninfo.com`): Add CNAME record to `ekbugo.github.io`
+
+   See [GitHub's custom domain docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) for IP addresses.
+
+3. **Update GitHub Settings**
+
+   - Go to Settings → Pages
+   - Enter your custom domain in the "Custom domain" field
+   - Check "Enforce HTTPS" (may take a few minutes to enable)
+
+4. **Important Notes**
+
+   - The Vite config automatically handles both custom domains and `github.io` paths
+   - When using a custom domain, the base path is `/` (root)
+   - When using `github.io`, the base path is `/weather-game/`
+   - No code changes needed when switching between them!
+
+5. **To Remove Custom Domain**
+
+   - Go to Settings → Pages and clear the "Custom domain" field
+   - Delete the `CNAME` file from `frontend/public/` directory
+   - Commit and push the changes
+   - Trigger a new deployment (push to main or manual workflow)
 
 ---
 
