@@ -97,7 +97,7 @@ async function main() {
   currentMonday.setHours(0, 0, 0, 0);
 
   // Rotate through stations for each week
-  const stationRotation = ['IMAYAG30', 'ICAYEY43', 'IAGUAD73', 'ICABOR73'];
+  const stationRotation = ['IMAYAG30', 'ICAYEY43', 'IAGUAD73', 'ICABOR73','IARECI36','IVEGAB17','ICULEB6','IPONCE128','IMARIC13'];
 
   for (let week = 0; week < 4; week++) {
     const monday = new Date(currentMonday);
