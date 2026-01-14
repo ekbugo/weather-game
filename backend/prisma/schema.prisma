@@ -35,23 +35,10 @@ model Station {
   longitude       Decimal? @db.Decimal(10, 6)
   wundergroundUrl String?  @map("wunderground_url")
 
-  schedules       WeeklySchedule[]
   forecasts       Forecast[]
   readings        StationReading[]
 
   @@map("stations")
-}
-
-model WeeklySchedule {
-  id          Int       @id @default(autoincrement())
-  stationId   String    @map("station_id")
-  weekStart   DateTime  @map("week_start") @db.Date // Monday of the week
-  announcedAt DateTime? @map("announced_at")
-
-  station     Station   @relation(fields: [stationId], references: [id])
-
-  @@unique([stationId, weekStart])
-  @@map("weekly_schedule")
 }
 
 model Forecast {

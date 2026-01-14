@@ -169,10 +169,9 @@ router.get('/current', async (req, res) => {
       }
     }
 
-    // Try to read from config file first
+    // Read from config file (single source of truth)
     const configPath = path.join(__dirname, '../../config/weekly-schedule.json');
     let stationId = null;
-    let source = 'database';
 
     console.log(`Config path: ${configPath}`);
     console.log(`Config exists: ${fs.existsSync(configPath)}`);
@@ -190,7 +189,6 @@ router.get('/current', async (req, res) => {
 
         if (scheduleEntry) {
           stationId = scheduleEntry.stationId;
-          source = 'config';
           console.log(`✅ Using station from config file: ${stationId} for date ${forecastDate}`);
         } else {
           console.log(`⚠️ No config entry found for ${forecastDate}`);
@@ -249,13 +247,11 @@ router.get('/current', async (req, res) => {
     }
 
     console.log(`✅ Returning station: ${station.name} (${station.id})`);
-    console.log(`Source: ${source}`);
     console.log('=== END DEBUG ===\n');
 
     res.json({
       station,
-      forecastDate,
-      source // 'config' or 'database'
+      forecastDate
     });
   } catch (error) {
     console.error('Get current station error:', error);
@@ -284,37 +280,6 @@ router.get('/:id', async (req, res) => {
   } catch (error) {
     console.error('Get station error:', error);
     res.status(500).json({ error: 'Failed to get station' });
-  }
-});
-
-/**
- * GET /api/stations/schedule/upcoming
- * Get upcoming weekly schedules
- */
-router.get('/schedule/upcoming', async (req, res) => {
-  try {
-    const prisma = req.prisma;
-    const now = nowAST();
-
-    const schedules = await prisma.weeklySchedule.findMany({
-      where: {
-        weekStart: {
-          gte: now.minus({ weeks: 1 }).startOf('week').toJSDate()
-        }
-      },
-      include: {
-        station: true
-      },
-      orderBy: {
-        weekStart: 'asc'
-      },
-      take: 4
-    });
-
-    res.json({ schedules });
-  } catch (error) {
-    console.error('Get schedule error:', error);
-    res.status(500).json({ error: 'Failed to get schedule' });
   }
 });
 
