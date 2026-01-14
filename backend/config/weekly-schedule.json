@@ -1,9 +1,18 @@
 {
   "schedule": [
     { "date": "2026-01-15", "stationId": "ICAYEY43", "notes": "Cayey" },
-    { "date": "2026-01-22", "stationId": "IARECI36", "notes": "Arecibo" },
+    { "date": "2026-01-20", "stationId": "IAGUAD73", "notes": "Aguadilla" },
+    { "date": "2026-01-22", "stationId": "ICABOR73", "notes": "Cabo Rojo" },
     { "date": "2026-01-27", "stationId": "IMARIC13", "notes": "Maricao" },
-    { "date": "2026-01-29", "stationId": "IAGUAD73", "notes": "Aguadilla" }
+    { "date": "2026-01-29", "stationId": "IAGUAD73", "notes": "Aguadilla" },
+    { "date": "2026-02-03", "stationId": "ICAYEY43", "notes": "Cayey" },
+    { "date": "2026-02-05", "stationId": "IARECI36", "notes": "Arecibo" },
+    { "date": "2026-02-10", "stationId": "IMARIC13", "notes": "Maricao" },
+    { "date": "2026-02-12", "stationId": "IAGUAD73", "notes": "Aguadilla" },
+    { "date": "2026-02-17", "stationId": "ICAYEY43", "notes": "Cayey" },
+    { "date": "2026-02-19", "stationId": "IARECI36", "notes": "Arecibo" },
+    { "date": "2026-02-24", "stationId": "IMARIC13", "notes": "Maricao" },
+    { "date": "2026-02-26", "stationId": "IAGUAD73", "notes": "Aguadilla" }
   ],
   "_instructions": "Edit this file to change the daily station schedule. Each entry is for a specific forecast date. If a station goes offline, simply change the stationId for that date. Valid stationIds: IMAYAG30, ICAYEY43, IAGUAD73, ICABOR73"
 }
