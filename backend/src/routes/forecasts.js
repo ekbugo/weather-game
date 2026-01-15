@@ -17,10 +17,10 @@ const router = express.Router();
 
 /**
  * Helper function to find the next scheduled forecast date from config
- * @param {string} afterDate - ISO date string to search after (exclusive)
+ * @param {DateTime} currentTime - Current time in AST (Luxon DateTime object)
  * @returns {object|null} - { date, stationId, opensAt } or null if none found
  */
-function findNextScheduledForecast(afterDate) {
+function findNextScheduledForecast(currentTime) {
   const configPath = path.join(__dirname, '../../config/weekly-schedule.json');
 
   if (!fs.existsSync(configPath)) {
@@ -30,9 +30,16 @@ function findNextScheduledForecast(afterDate) {
   try {
     const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
-    // Find all dates after the given date, sorted chronologically
+    // Find all scheduled forecasts whose submission window hasn't closed yet
     const futureDates = configData.schedule
-      ?.filter(entry => entry.date > afterDate)
+      ?.filter(entry => {
+        const forecastDate = DateTime.fromISO(entry.date, { zone: 'America/Puerto_Rico' });
+        // Window closes at 5:00 PM AST on the day before the forecast
+        const windowCloses = forecastDate.minus({ days: 1 }).set({ hour: 17, minute: 0, second: 0 });
+
+        // Only include forecasts whose window hasn't closed yet
+        return currentTime < windowCloses;
+      })
       .sort((a, b) => a.date.localeCompare(b.date));
 
     if (!futureDates || futureDates.length === 0) {
@@ -117,8 +124,7 @@ router.get('/status', (req, res) => {
   if (!forecastDate) {
     // After 5pm - window closed for today
     console.log('⏰ After 5pm - window closed');
-    const today = now.toISODate();
-    const nextForecast = findNextScheduledForecast(today);
+    const nextForecast = findNextScheduledForecast(now);
 
     console.log(`Next forecast:`, nextForecast);
     console.log('=== END DEBUG ===\n');
@@ -140,7 +146,7 @@ router.get('/status', (req, res) => {
   if (!isScheduled) {
     // No forecast scheduled for tomorrow
     console.log('❌ No forecast scheduled for tomorrow');
-    const nextForecast = findNextScheduledForecast(forecastDate);
+    const nextForecast = findNextScheduledForecast(now);
 
     console.log(`Next forecast:`, nextForecast);
     console.log('=== END DEBUG ===\n');
