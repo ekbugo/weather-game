@@ -38,6 +38,7 @@ jobs:
         working-directory: ./frontend
         env:
           GITHUB_PAGES: 'true'
+          VITE_CUSTOM_DOMAIN: 'true'  # Set to 'false' to use github.io URL with /weather-game/ path
           # Set your Railway API URL here or use GitHub secrets
           VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://your-railway-api-url.railway.app/api' }}
         run: npm run build
