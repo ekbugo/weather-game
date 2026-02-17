@@ -1,5 +1,5 @@
 const express = require('express');
-const { getWeekStart, nowAST, getCurrentForecastDate } = require('../utils/timeUtils');
+const { getWeekStart, nowAST, getCurrentForecastDate, isDateScheduled } = require('../utils/timeUtils');
 const fs = require('fs');
 const path = require('path');
 const { DateTime } = require('luxon');
@@ -134,39 +134,46 @@ router.get('/current', async (req, res) => {
     console.log(`Forecast date: ${forecastDate}`);
 
     if (!forecastDate) {
-      // After 5pm - submissions are closed for today
-      console.log('⏰ After 5pm - submissions closed for today');
-      console.log('🔍 Looking for next scheduled forecast...');
-
-      // Find the next scheduled forecast after today
+      // No active forecast — determine why
+      const tomorrow = now.plus({ days: 1 }).toISODate();
+      const tomorrowScheduled = isDateScheduled(tomorrow);
       const today = now.toISODate();
       const nextForecast = findNextScheduledForecast(today);
 
+      let reason, message;
+      if (now.hour >= 17 && tomorrowScheduled) {
+        // After 5 PM and tomorrow IS scheduled — window was open today and just closed
+        reason = 'window_closed';
+        message = 'Forecast submissions are closed for today.';
+        console.log('⏰ After 5pm - window closed (tomorrow is scheduled)');
+      } else if (nextForecast) {
+        // No forecast scheduled for tomorrow
+        reason = 'no_forecast_scheduled';
+        message = 'There is no forecast scheduled for tomorrow.';
+        console.log('❌ No forecast scheduled for tomorrow');
+      } else {
+        reason = 'no_forecasts_available';
+        message = 'No upcoming forecasts scheduled.';
+        console.log('❌ No future forecasts found');
+      }
+
+      console.log('🔍 Looking for next scheduled forecast...');
       if (nextForecast) {
         console.log(`📅 Next forecast: ${nextForecast.date}, opens at ${nextForecast.opensAt}`);
-
-        return res.json({
-          station: null,
-          forecastDate: null,
-          isOpen: false,
-          reason: 'window_closed',
-          message: 'Forecast submissions are closed for today.',
-          nextForecast: {
-            date: nextForecast.date,
-            opensAt: nextForecast.opensAt,
-            stationId: nextForecast.stationId
-          }
-        });
-      } else {
-        console.log(`❌ No future forecasts found`);
-        return res.json({
-          station: null,
-          forecastDate: null,
-          isOpen: false,
-          reason: 'no_forecasts_available',
-          message: 'No upcoming forecasts scheduled.'
-        });
       }
+
+      return res.json({
+        station: null,
+        forecastDate: null,
+        isOpen: false,
+        reason,
+        message,
+        nextForecast: nextForecast ? {
+          date: nextForecast.date,
+          opensAt: nextForecast.opensAt,
+          stationId: nextForecast.stationId
+        } : undefined
+      });
     }
 
     // Read from config file (single source of truth)
