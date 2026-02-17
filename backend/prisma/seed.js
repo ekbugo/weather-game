@@ -39,8 +39,8 @@ async function main() {
     },
     {
       id: 'IMARIC13',
-      name: 'Maricao Station',
-      locationDesc: 'Weather station located in Maricao, Puerto Rico.',
+      name: 'Indiera Alta Station',
+      locationDesc: 'Weather station located in Indiera Alta Maricao, Puerto Rico.',
       latitude: 18.15,
       longitude: -66.88,
       wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IMARIC13'
@@ -76,6 +76,22 @@ async function main() {
       latitude: 18.46,
       longitude: -66.74,
       wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IARECI36'
+    },
+     {
+      id: 'IMARIC10',
+      name: 'Maricao Station',
+      locationDesc: 'Weather station located in Maricao, Puerto Rico.',
+      latitude: 18.18,
+      longitude: -66.99,
+      wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/IMARIC10'
+    },
+     {
+      id: 'ICAROL53',
+      name: 'Carolina Station',
+      locationDesc: 'Weather station located in Carolina, Puerto Rico.',
+      latitude: 18.39,
+      longitude: -65.96,
+      wundergroundUrl: 'https://www.wunderground.com/dashboard/pws/ICAROL53'
     }
   ];
 
