@@ -1,7 +1,36 @@
 const { DateTime } = require('luxon');
+const fs = require('fs');
+const path = require('path');
 
 const AST_ZONE = 'America/Puerto_Rico';
 const AST_OFFSET = -4; // AST is UTC-4
+
+/**
+ * Load the weekly schedule from config file
+ * @returns {Array} Array of schedule entries [{ date, stationId, notes }]
+ */
+function loadSchedule() {
+  const configPath = path.join(__dirname, '../../config/weekly-schedule.json');
+  try {
+    if (fs.existsSync(configPath)) {
+      const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+      return configData.schedule || [];
+    }
+  } catch (err) {
+    console.error('[TimeUtils] Error reading schedule:', err.message);
+  }
+  return [];
+}
+
+/**
+ * Check if a forecast is scheduled for a specific date
+ * @param {string} date - ISO date string (YYYY-MM-DD)
+ * @returns {boolean}
+ */
+function isDateScheduled(date) {
+  const schedule = loadSchedule();
+  return schedule.some(entry => entry.date === date);
+}
 
 /**
  * Get current time in AST (Atlantic Standard Time - Puerto Rico)
@@ -57,14 +86,19 @@ function canSubmitForecast(forecastDate) {
 
 /**
  * Get the forecast date that's currently accepting submissions
- * Returns null if submissions are closed
+ * Returns null if submissions are closed or no forecast is scheduled
+ * Schedule-aware: only returns a date if it's actually in the weekly schedule
  */
 function getCurrentForecastDate() {
   const now = nowAST();
 
   if (now.hour < 17) {
-    // Before 5pm: accepting forecasts for tomorrow
-    return now.plus({ days: 1 }).toISODate();
+    // Before 5pm: check if tomorrow is actually scheduled
+    const tomorrow = now.plus({ days: 1 }).toISODate();
+    if (isDateScheduled(tomorrow)) {
+      return tomorrow;
+    }
+    return null;
   } else {
     // After 5pm: submissions closed for today
     return null;
@@ -73,6 +107,7 @@ function getCurrentForecastDate() {
 
 /**
  * Get submission window info for the current forecast date
+ * Schedule-aware: distinguishes between "window closed" and "no forecast scheduled"
  */
 function getSubmissionWindow() {
   const now = nowAST();
@@ -89,13 +124,38 @@ function getSubmissionWindow() {
       remainingMinutes: Math.floor(closesAt.diff(now, 'minutes').minutes)
     };
   } else {
-    // After 5pm - next window opens at midnight
-    const opensAt = now.plus({ days: 1 }).startOf('day');
-    const nextForecastDate = now.plus({ days: 2 }).toISODate();
+    const tomorrow = now.plus({ days: 1 }).toISODate();
+
+    // Determine reason: was there a window today that closed, or no forecast at all?
+    let reason;
+    if (now.hour >= 17 && isDateScheduled(tomorrow)) {
+      // After 5 PM and tomorrow IS scheduled — the window was open today and just closed
+      reason = 'window_closed';
+    } else {
+      // Either before 5 PM with no scheduled forecast, or after 5 PM with nothing scheduled
+      reason = 'no_forecast_scheduled';
+    }
+
+    // Find the next scheduled forecast date from the schedule
+    const schedule = loadSchedule();
+    const futureEntries = schedule
+      .filter(entry => {
+        const forecastDate = DateTime.fromISO(entry.date, { zone: AST_ZONE });
+        const windowCloses = forecastDate.minus({ days: 1 }).set({ hour: 17, minute: 0, second: 0 });
+        return now < windowCloses;
+      })
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    const nextEntry = futureEntries[0] || null;
+    const nextForecastDate = nextEntry?.date || now.plus({ days: 2 }).toISODate();
+    const opensAt = nextEntry
+      ? DateTime.fromISO(nextEntry.date, { zone: AST_ZONE }).minus({ days: 1 }).startOf('day')
+      : now.plus({ days: 1 }).startOf('day');
 
     return {
       isOpen: false,
-      nextForecastDate: nextForecastDate,
+      reason,
+      nextForecastDate,
       opensAt: opensAt.toISO(),
       minutesUntilOpen: Math.floor(opensAt.diff(now, 'minutes').minutes)
     };
@@ -136,5 +196,7 @@ module.exports = {
   getSubmissionWindow,
   getWeekStart,
   isAnnouncementTime,
-  formatDateAST
+  formatDateAST,
+  isDateScheduled,
+  loadSchedule
 };

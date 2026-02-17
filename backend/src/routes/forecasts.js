@@ -6,7 +6,8 @@ const {
   getCurrentForecastDate,
   getSubmissionWindow,
   getWeekStart,
-  nowAST
+  nowAST,
+  isDateScheduled
 } = require('../utils/timeUtils');
 const { getPrecipRangeDescription } = require('../services/scoringService');
 const fs = require('fs');
@@ -120,41 +121,33 @@ router.get('/status', (req, res) => {
     ...getPrecipRangeDescription(range)
   }));
 
-  // Check if submissions are open based on time
+  // Check if submissions are open (getCurrentForecastDate is now schedule-aware)
   if (!forecastDate) {
-    // After 5pm - window closed for today
-    console.log('⏰ After 5pm - window closed');
+    // No active forecast — determine why
+    const tomorrow = now.plus({ days: 1 }).toISODate();
+    const tomorrowScheduled = isDateScheduled(tomorrow);
     const nextForecast = findNextScheduledForecast(now);
+
+    let reason, message;
+    if (now.hour >= 17 && tomorrowScheduled) {
+      // After 5 PM and tomorrow IS scheduled — window was open today and just closed
+      reason = 'window_closed';
+      message = 'Forecast submissions are closed for today.';
+      console.log('⏰ After 5pm - window closed (tomorrow is scheduled)');
+    } else {
+      // No forecast scheduled (either before 5 PM with nothing tomorrow, or after 5 PM with nothing)
+      reason = 'no_forecast_scheduled';
+      message = 'There is no forecast scheduled for tomorrow.';
+      console.log('❌ No forecast scheduled for tomorrow');
+    }
 
     console.log(`Next forecast:`, nextForecast);
     console.log('=== END DEBUG ===\n');
 
     return res.json({
       isOpen: false,
-      reason: 'window_closed',
-      message: 'Forecast submissions are closed for today.',
-      nextForecast: nextForecast || undefined,
-      precipRanges,
-      currentTime: now.toISO()
-    });
-  }
-
-  // Check if a forecast is actually scheduled for this date
-  const isScheduled = isForecastScheduled(forecastDate);
-  console.log(`Forecast scheduled for ${forecastDate}: ${isScheduled}`);
-
-  if (!isScheduled) {
-    // No forecast scheduled for tomorrow
-    console.log('❌ No forecast scheduled for tomorrow');
-    const nextForecast = findNextScheduledForecast(now);
-
-    console.log(`Next forecast:`, nextForecast);
-    console.log('=== END DEBUG ===\n');
-
-    return res.json({
-      isOpen: false,
-      reason: 'no_forecast_scheduled',
-      message: `No forecast scheduled for ${forecastDate}.`,
+      reason,
+      message,
       nextForecast: nextForecast || undefined,
       precipRanges,
       currentTime: now.toISO()
