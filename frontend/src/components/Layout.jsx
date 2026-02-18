@@ -189,7 +189,7 @@ function Layout() {
       <footer className="bg-white border-t mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
-            <p>© 2024 Huracán Info & Puerto Rico Meteorological Society</p>
+            <p>© 2026 Huracán Info</p>
             <p className="mt-2 sm:mt-0">
               {t('app.tagline')}
             </p>
