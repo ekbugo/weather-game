@@ -100,6 +100,7 @@ model Score {
   windGustScore Int      @map("wind_gust_score")  // 0-5
   precipScore   Int      @map("precip_score")     // 0-5
   perfectBonus  Int      @default(0) @map("perfect_bonus") // +3 if all perfect
+  latePenalty   Int      @default(0) @map("late_penalty")  // -3 if submitted during grace period (5-7 PM)
 
   totalScore    Int      @map("total_score")
 

@@ -67,7 +67,7 @@ function startOfDayAST(date) {
 /**
  * Check if forecast submission is open for a given date
  * Submissions open: day before at 12:00 AM AST
- * Submissions close: day before at 5:00 PM AST
+ * Submissions close: day before at 7:00 PM AST (grace period 5-7 PM with penalty)
  */
 function canSubmitForecast(forecastDate) {
   const now = nowAST();
@@ -78,36 +78,46 @@ function canSubmitForecast(forecastDate) {
   // Submissions open: day before at 12:00 AM AST
   const opensAt = forecastDateObj.minus({ days: 1 }).startOf('day');
 
-  // Submissions close: day before at 5:00 PM AST
-  const closesAt = forecastDateObj.minus({ days: 1 }).set({ hour: 17, minute: 0, second: 0 });
+  // Hard close: day before at 7:00 PM AST (grace period ends)
+  const hardCloseAt = forecastDateObj.minus({ days: 1 }).set({ hour: 19, minute: 0, second: 0 });
 
-  return now >= opensAt && now <= closesAt;
+  return now >= opensAt && now <= hardCloseAt;
 }
 
 /**
  * Get the forecast date that's currently accepting submissions
- * Returns null if submissions are closed or no forecast is scheduled
+ * Returns null if submissions are fully closed or no forecast is scheduled
  * Schedule-aware: only returns a date if it's actually in the weekly schedule
+ * Accepts submissions until 7 PM (grace period 5-7 PM with penalty)
  */
 function getCurrentForecastDate() {
   const now = nowAST();
 
-  if (now.hour < 17) {
-    // Before 5pm: check if tomorrow is actually scheduled
+  if (now.hour < 19) {
+    // Before 7pm: check if tomorrow is actually scheduled
     const tomorrow = now.plus({ days: 1 }).toISODate();
     if (isDateScheduled(tomorrow)) {
       return tomorrow;
     }
     return null;
   } else {
-    // After 5pm: submissions closed for today
+    // After 7pm: submissions fully closed
     return null;
   }
 }
 
 /**
+ * Check if the current time is in the grace period (5-7 PM AST)
+ * @returns {boolean}
+ */
+function isGracePeriod() {
+  const now = nowAST();
+  return now.hour >= 17 && now.hour < 19;
+}
+
+/**
  * Get submission window info for the current forecast date
- * Schedule-aware: distinguishes between "window closed" and "no forecast scheduled"
+ * Schedule-aware: distinguishes between open, grace_period, window_closed, and no_forecast_scheduled
  */
 function getSubmissionWindow() {
   const now = nowAST();
@@ -115,24 +125,31 @@ function getSubmissionWindow() {
 
   if (currentForecastDate) {
     const forecastDateObj = DateTime.fromISO(currentForecastDate, { zone: AST_ZONE });
-    const closesAt = forecastDateObj.minus({ days: 1 }).set({ hour: 17, minute: 0, second: 0 });
+    const normalCloseAt = forecastDateObj.minus({ days: 1 }).set({ hour: 17, minute: 0, second: 0 });
+    const hardCloseAt = forecastDateObj.minus({ days: 1 }).set({ hour: 19, minute: 0, second: 0 });
+
+    const inGracePeriod = now >= normalCloseAt && now < hardCloseAt;
 
     return {
       isOpen: true,
+      gracePeriod: inGracePeriod,
       forecastDate: currentForecastDate,
-      closesAt: closesAt.toISO(),
-      remainingMinutes: Math.floor(closesAt.diff(now, 'minutes').minutes)
+      closesAt: normalCloseAt.toISO(),
+      hardCloseAt: hardCloseAt.toISO(),
+      remainingMinutes: inGracePeriod
+        ? Math.floor(hardCloseAt.diff(now, 'minutes').minutes)
+        : Math.floor(normalCloseAt.diff(now, 'minutes').minutes)
     };
   } else {
     const tomorrow = now.plus({ days: 1 }).toISODate();
 
     // Determine reason: was there a window today that closed, or no forecast at all?
     let reason;
-    if (now.hour >= 17 && isDateScheduled(tomorrow)) {
-      // After 5 PM and tomorrow IS scheduled — the window was open today and just closed
+    if (now.hour >= 19 && isDateScheduled(tomorrow)) {
+      // After 7 PM and tomorrow IS scheduled — the window (including grace period) has fully closed
       reason = 'window_closed';
     } else {
-      // Either before 5 PM with no scheduled forecast, or after 5 PM with nothing scheduled
+      // Either before 7 PM with no scheduled forecast, or after 7 PM with nothing scheduled
       reason = 'no_forecast_scheduled';
     }
 
@@ -141,7 +158,7 @@ function getSubmissionWindow() {
     const futureEntries = schedule
       .filter(entry => {
         const forecastDate = DateTime.fromISO(entry.date, { zone: AST_ZONE });
-        const windowCloses = forecastDate.minus({ days: 1 }).set({ hour: 17, minute: 0, second: 0 });
+        const windowCloses = forecastDate.minus({ days: 1 }).set({ hour: 19, minute: 0, second: 0 });
         return now < windowCloses;
       })
       .sort((a, b) => a.date.localeCompare(b.date));
@@ -194,6 +211,7 @@ module.exports = {
   canSubmitForecast,
   getCurrentForecastDate,
   getSubmissionWindow,
+  isGracePeriod,
   getWeekStart,
   isAnnouncementTime,
   formatDateAST,

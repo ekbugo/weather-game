@@ -7,6 +7,7 @@ import {
   Trophy,
   TrendingUp,
   Star,
+  Clock,
   ChevronDown,
   ChevronUp,
   Thermometer,
@@ -361,6 +362,15 @@ function UserProfile() {
                                 {t('scores.perfectBonus')}
                               </span>
                               <span>+{score.scores.perfectBonus} pts</span>
+                            </div>
+                          )}
+                          {score.scores.latePenalty < 0 && (
+                            <div className="flex justify-between text-orange-600 font-medium pt-2 border-t">
+                              <span className="flex items-center">
+                                <Clock className="w-4 h-4 mr-1" />
+                                {t('scores.latePenalty')}
+                              </span>
+                              <span>{score.scores.latePenalty} pts</span>
                             </div>
                           )}
                           <div className="flex justify-between pt-2 border-t font-bold text-lg">
