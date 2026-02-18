@@ -99,7 +99,7 @@ model Score {
   minTempScore  Int      @map("min_temp_score")   // 0-5
   windGustScore Int      @map("wind_gust_score")  // 0-5
   precipScore   Int      @map("precip_score")     // 0-5
-  perfectBonus  Int      @default(0) @map("perfect_bonus") // +5 if all perfect
+  perfectBonus  Int      @default(0) @map("perfect_bonus") // +3 if all perfect
 
   totalScore    Int      @map("total_score")
 

@@ -128,13 +128,13 @@ function calculateTotalScore(forecast, reading) {
     reading.precipRange
   );
 
-  // Perfect forecast bonus: +5 if all parameters are perfect
+  // Perfect forecast bonus: +3 if all parameters are perfect
   const isPerfect = maxTempScore === 5 &&
                     minTempScore === 5 &&
                     windGustScore === 5 &&
                     precipScore === 5;
 
-  const perfectBonus = isPerfect ? 5 : 0;
+  const perfectBonus = isPerfect ? 3 : 0;
 
   const totalScore = maxTempScore + minTempScore + windGustScore + precipScore + perfectBonus;
 

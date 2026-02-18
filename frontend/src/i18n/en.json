@@ -105,7 +105,7 @@
     "step3Title": "3. Compare",
     "step3Desc": "Your forecast is compared against actual station data",
     "step4Title": "4. Earn Points",
-    "step4Desc": "Up to 20 points per day + 5 point bonus for perfect forecast",
+    "step4Desc": "Up to 20 points per day + 3 point bonus for perfect forecast",
     "scoringSystem": "Scoring System",
     "temperature": "Temperature (Max/Min)",
     "windGust": "Wind Gust",
@@ -116,8 +116,8 @@
     "range": "Range",
     "rangesDiff": "ranges diff.",
     "rangeDiff": "range diff.",
-    "perfectBonusTitle": "Perfect Forecast Bonus: +5 points!",
-    "perfectBonusDesc": "If you get all parameters exactly right, you receive 5 additional points."
+    "perfectBonusTitle": "Perfect Forecast Bonus: +3 points!",
+    "perfectBonusDesc": "If you get all parameters exactly right, you receive 3 additional points."
   },
   "common": {
     "loading": "Loading...",

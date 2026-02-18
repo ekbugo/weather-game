@@ -105,7 +105,7 @@
     "step3Title": "3. Compara",
     "step3Desc": "Tu pronóstico se compara con los datos reales de la estación",
     "step4Title": "4. Gana puntos",
-    "step4Desc": "Hasta 20 puntos por día + 5 puntos bonus por pronóstico perfecto",
+    "step4Desc": "Hasta 20 puntos por día + 3 puntos bonus por pronóstico perfecto",
     "scoringSystem": "Sistema de Puntuación",
     "temperature": "Temperatura (Máx/Mín)",
     "windGust": "Ráfaga de Viento",
@@ -116,8 +116,8 @@
     "range": "Rango",
     "rangesDiff": "rangos diff.",
     "rangeDiff": "rango diff.",
-    "perfectBonusTitle": "¡Bono de Pronóstico Perfecto: +5 puntos!",
-    "perfectBonusDesc": "Si aciertas todos los parámetros perfectamente, recibes 5 puntos adicionales."
+    "perfectBonusTitle": "¡Bono de Pronóstico Perfecto: +3 puntos!",
+    "perfectBonusDesc": "Si aciertas todos los parámetros perfectamente, recibes 3 puntos adicionales."
   },
   "common": {
     "loading": "Cargando...",
