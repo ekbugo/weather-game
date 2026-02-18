@@ -84,7 +84,7 @@ router.get('/my-scores', authenticateToken, async (req, res) => {
     });
 
     const perfectCount = await prisma.score.count({
-      where: { userId, perfectBonus: 5 }
+      where: { userId, perfectBonus: 3 }
     });
 
     res.json({
@@ -321,7 +321,7 @@ router.get('/user/:username', authenticateToken, async (req, res) => {
     });
 
     const perfectCount = await prisma.score.count({
-      where: { userId: targetUser.id, perfectBonus: 5 }
+      where: { userId: targetUser.id, perfectBonus: 3 }
     });
 
     res.json({

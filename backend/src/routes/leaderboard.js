@@ -176,7 +176,7 @@ router.get('/stats', async (req, res) => {
         _avg: { totalScore: true }
       }),
       prisma.score.count({
-        where: { perfectBonus: 5 }
+        where: { perfectBonus: 3 }
       })
     ]);
 
