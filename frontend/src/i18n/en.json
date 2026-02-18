@@ -84,6 +84,7 @@
     "score": "Score",
     "total": "Total",
     "perfectBonus": "Perfect Bonus!",
+    "latePenalty": "Late Penalty",
     "maxTemp": "Max Temp",
     "minTemp": "Min Temp",
     "windGust": "Wind Gust",
@@ -100,8 +101,8 @@
     "howItWorks": "How It Works",
     "step1Title": "1. Forecast",
     "step1Desc": "Predict max/min temperature, wind gusts, and precipitation",
-    "step2Title": "2. Submit before 5 PM",
-    "step2Desc": "Submission window closes at 5:00 PM AST the day before",
+    "step2Title": "2. Submit before 7 PM",
+    "step2Desc": "Submit by 5 PM AST. Late submissions (5-7 PM) receive a -3 point penalty",
     "step3Title": "3. Compare",
     "step3Desc": "Your forecast is compared against actual station data",
     "step4Title": "4. Earn Points",
@@ -117,7 +118,10 @@
     "rangesDiff": "ranges diff.",
     "rangeDiff": "range diff.",
     "perfectBonusTitle": "Perfect Forecast Bonus: +3 points!",
-    "perfectBonusDesc": "If you get all parameters exactly right, you receive 3 additional points."
+    "perfectBonusDesc": "If you get all parameters exactly right, you receive 3 additional points.",
+    "latePenaltyTitle": "Late Submission Penalty: -3 points",
+    "latePenaltyDesc": "Forecasts submitted between 5:01-7:00 PM AST receive a -3 point penalty. No submissions accepted after 7:00 PM.",
+    "gracePeriodWarning": "Grace period: your submission will receive a -3 point late penalty"
   },
   "common": {
     "loading": "Loading...",

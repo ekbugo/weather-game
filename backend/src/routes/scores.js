@@ -71,6 +71,7 @@ router.get('/my-scores', authenticateToken, async (req, res) => {
           rangeDiff: Math.abs(s.forecast.precipRange - s.reading.precipRange)
         },
         perfectBonus: s.perfectBonus,
+        latePenalty: s.latePenalty,
         total: s.totalScore
       }
     }));
@@ -188,6 +189,7 @@ router.get('/date/:date', async (req, res) => {
           windGust: s.windGustScore,
           precip: s.precipScore,
           perfectBonus: s.perfectBonus,
+          latePenalty: s.latePenalty,
           total: s.totalScore
         }
       })),
@@ -308,6 +310,7 @@ router.get('/user/:username', authenticateToken, async (req, res) => {
           rangeDiff: Math.abs(s.forecast.precipRange - s.reading.precipRange)
         },
         perfectBonus: s.perfectBonus,
+        latePenalty: s.latePenalty,
         total: s.totalScore
       }
     }));

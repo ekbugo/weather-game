@@ -102,8 +102,36 @@ function roundTemperature(temp) {
 }
 
 /**
+ * Determine if a forecast was submitted during the grace period (5-7 PM AST)
+ * @param {Date} submittedAt - When the forecast was submitted
+ * @param {Date|string} forecastDate - The forecast date
+ * @returns {number} 0 or -3
+ */
+function calculateLatePenalty(submittedAt, forecastDate) {
+  if (!submittedAt || !forecastDate) return 0;
+
+  const { DateTime } = require('luxon');
+  const AST_ZONE = 'America/Puerto_Rico';
+
+  const submitted = DateTime.fromJSDate(new Date(submittedAt)).setZone(AST_ZONE);
+  const fDate = typeof forecastDate === 'string'
+    ? DateTime.fromISO(forecastDate, { zone: AST_ZONE })
+    : DateTime.fromJSDate(new Date(forecastDate)).setZone(AST_ZONE);
+
+  // Normal close: day before forecast at 5:00 PM AST
+  const normalClose = fDate.minus({ days: 1 }).set({ hour: 17, minute: 0, second: 0 });
+  // Hard close: day before forecast at 7:00 PM AST
+  const hardClose = fDate.minus({ days: 1 }).set({ hour: 19, minute: 0, second: 0 });
+
+  if (submitted > normalClose && submitted <= hardClose) {
+    return -3;
+  }
+  return 0;
+}
+
+/**
  * Calculate complete score for a forecast vs actual reading
- * @param {object} forecast - User's forecast
+ * @param {object} forecast - User's forecast (must include submittedAt and forecastDate for late penalty)
  * @param {object} reading - Station reading
  * @returns {object} Detailed score breakdown
  */
@@ -136,7 +164,10 @@ function calculateTotalScore(forecast, reading) {
 
   const perfectBonus = isPerfect ? 3 : 0;
 
-  const totalScore = maxTempScore + minTempScore + windGustScore + precipScore + perfectBonus;
+  // Late penalty: -3 if submitted during grace period (5-7 PM AST)
+  const latePenalty = calculateLatePenalty(forecast.submittedAt, forecast.forecastDate);
+
+  const totalScore = maxTempScore + minTempScore + windGustScore + precipScore + perfectBonus + latePenalty;
 
   return {
     maxTempScore,
@@ -144,6 +175,7 @@ function calculateTotalScore(forecast, reading) {
     windGustScore,
     precipScore,
     perfectBonus,
+    latePenalty,
     totalScore,
     isPerfect,
     breakdown: {
@@ -206,5 +238,6 @@ module.exports = {
   getPrecipRangeDescription,
   roundTemperature,
   calculateTotalScore,
+  calculateLatePenalty,
   processStationReading
 };

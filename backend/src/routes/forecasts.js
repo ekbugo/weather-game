@@ -35,8 +35,8 @@ function findNextScheduledForecast(currentTime) {
     const futureDates = configData.schedule
       ?.filter(entry => {
         const forecastDate = DateTime.fromISO(entry.date, { zone: 'America/Puerto_Rico' });
-        // Window closes at 5:00 PM AST on the day before the forecast
-        const windowCloses = forecastDate.minus({ days: 1 }).set({ hour: 17, minute: 0, second: 0 });
+        // Window hard-closes at 7:00 PM AST on the day before the forecast (grace period ends)
+        const windowCloses = forecastDate.minus({ days: 1 }).set({ hour: 19, minute: 0, second: 0 });
 
         // Only include forecasts whose window hasn't closed yet
         return currentTime < windowCloses;
@@ -129,11 +129,11 @@ router.get('/status', (req, res) => {
     const nextForecast = findNextScheduledForecast(now);
 
     let reason, message;
-    if (now.hour >= 17 && tomorrowScheduled) {
-      // After 5 PM and tomorrow IS scheduled — window was open today and just closed
+    if (now.hour >= 19 && tomorrowScheduled) {
+      // After 7 PM and tomorrow IS scheduled — window was open today and just closed
       reason = 'window_closed';
       message = 'Forecast submissions are closed for today.';
-      console.log('⏰ After 5pm - window closed (tomorrow is scheduled)');
+      console.log('⏰ After 7pm - window closed (tomorrow is scheduled)');
     } else {
       // No forecast scheduled (either before 5 PM with nothing tomorrow, or after 5 PM with nothing)
       reason = 'no_forecast_scheduled';
@@ -333,6 +333,7 @@ router.get('/my-history', authenticateToken, async (req, res) => {
         windGustScore: f.score.windGustScore,
         precipScore: f.score.precipScore,
         perfectBonus: f.score.perfectBonus,
+        latePenalty: f.score.latePenalty,
         totalScore: f.score.totalScore
       } : null,
       submittedAt: f.submittedAt

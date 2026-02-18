@@ -160,7 +160,7 @@ function Forecast() {
       description = 'There is no forecast scheduled for tomorrow.';
     } else if (reason === 'window_closed') {
       title = t('forecast.closed');
-      description = 'Submissions closed at 5:00 PM AST today.';
+      description = 'Submissions closed at 7:00 PM AST today.';
     } else {
       title = t('forecast.closed');
       description = t('forecast.opensAt') + ' 12:00 AM AST';
@@ -248,6 +248,13 @@ function Forecast() {
           <div className="mt-3 text-sm bg-hurricane-500 rounded px-3 py-1 inline-block">
             {t('forecast.remaining')}: {submissionStatus?.remainingMinutes} {t('forecast.minutes')}
           </div>
+
+          {submissionStatus?.gracePeriod && (
+            <div className="mt-3 text-sm bg-orange-500 rounded px-3 py-2 flex items-center">
+              <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+              {t('home.gracePeriodWarning')}
+            </div>
+          )}
         </div>
 
         {/* Form */}

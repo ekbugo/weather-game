@@ -116,7 +116,10 @@ function Home() {
               <div className="mt-4 sm:mt-0 flex items-center space-x-2 text-green-600">
                 <Clock className="w-5 h-5" />
                 <span className="font-medium">
-                  {t('forecast.closesAt')} 5:00 PM AST
+                  {submissionStatus?.gracePeriod
+                    ? t('home.gracePeriodWarning')
+                    : `${t('forecast.closesAt')} 5:00 PM AST`
+                  }
                 </span>
               </div>
             )}
@@ -311,6 +314,18 @@ function Home() {
           </div>
           <p className="text-sm text-purple-600 mt-1">
             {t('home.perfectBonusDesc')}
+          </p>
+        </div>
+
+        <div className="mt-4 p-4 bg-orange-50 rounded-lg">
+          <div className="flex items-center">
+            <Clock className="w-6 h-6 text-orange-500 mr-2" />
+            <span className="font-semibold text-orange-700">
+              {t('home.latePenaltyTitle')}
+            </span>
+          </div>
+          <p className="text-sm text-orange-600 mt-1">
+            {t('home.latePenaltyDesc')}
           </p>
         </div>
       </div>

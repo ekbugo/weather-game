@@ -141,11 +141,11 @@ router.get('/current', async (req, res) => {
       const nextForecast = findNextScheduledForecast(today);
 
       let reason, message;
-      if (now.hour >= 17 && tomorrowScheduled) {
-        // After 5 PM and tomorrow IS scheduled — window was open today and just closed
+      if (now.hour >= 19 && tomorrowScheduled) {
+        // After 7 PM and tomorrow IS scheduled — window was open today and just closed
         reason = 'window_closed';
         message = 'Forecast submissions are closed for today.';
-        console.log('⏰ After 5pm - window closed (tomorrow is scheduled)');
+        console.log('⏰ After 7pm - window closed (tomorrow is scheduled)');
       } else if (nextForecast) {
         // No forecast scheduled for tomorrow
         reason = 'no_forecast_scheduled';

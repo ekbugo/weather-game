@@ -216,6 +216,7 @@ async function recalculateAllScores() {
             windGustScore: scoreResult.windGustScore,
             precipScore: scoreResult.precipScore,
             perfectBonus: scoreResult.perfectBonus,
+            latePenalty: scoreResult.latePenalty,
             totalScore: scoreResult.totalScore
           }
         });

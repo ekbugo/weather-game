@@ -80,6 +80,7 @@ async function calculateScoresForDate(dateStr) {
             windGustScore: scoreResult.windGustScore,
             precipScore: scoreResult.precipScore,
             perfectBonus: scoreResult.perfectBonus,
+            latePenalty: scoreResult.latePenalty,
             totalScore: scoreResult.totalScore
           }
         });

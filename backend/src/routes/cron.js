@@ -265,6 +265,7 @@ router.get('/debug-scores/:username', validateCronSecret, async (req, res) => {
           windGust: s.windGustScore,
           precip: s.precipScore,
           bonus: s.perfectBonus,
+          latePenalty: s.latePenalty,
           total: s.totalScore
         }
       }))
@@ -535,6 +536,7 @@ router.all('/fix-precipitation-scores', validateCronSecret, async (req, res) => 
             windGustScore: scoreResult.windGustScore,
             precipScore: scoreResult.precipScore,
             perfectBonus: scoreResult.perfectBonus,
+            latePenalty: scoreResult.latePenalty,
             totalScore: scoreResult.totalScore
           }
         });
