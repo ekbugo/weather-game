@@ -4,6 +4,8 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Forecast from './pages/Forecast';
 import Leaderboard from './pages/Leaderboard';
 import History from './pages/History';
@@ -55,6 +57,18 @@ function App() {
         <Route path="register" element={
           <PublicRoute>
             <Register />
+          </PublicRoute>
+        } />
+
+        <Route path="forgot-password" element={
+          <PublicRoute>
+            <ForgotPassword />
+          </PublicRoute>
+        } />
+
+        <Route path="reset-password" element={
+          <PublicRoute>
+            <ResetPassword />
           </PublicRoute>
         } />
 
