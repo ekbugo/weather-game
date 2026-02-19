@@ -35,11 +35,11 @@ function calculateMinTempScore(forecast, actual) {
  */
 function calculateWindGustScore(forecast, actual) {
   const diff = Math.abs(forecast - Math.round(actual));
-  if (diff === 0) return 5;
-  if (diff <= 2) return 4;
+  if (diff <= 1) return 5;
+  if (diff <= 3) return 4;
   if (diff <= 5) return 3;
   if (diff <= 9) return 2;
-  if (diff <= 14) return 1;
+  if (diff <= 13) return 1;
   return 0;
 }
 
