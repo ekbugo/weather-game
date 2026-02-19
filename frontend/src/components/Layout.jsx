@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import {
   Cloud,
+  House,
+  trending-up-down,
   Trophy,
   History,
   LogOut,
@@ -25,8 +27,8 @@ function Layout() {
   };
 
   const navItems = [
-    { path: '/', label: t('nav.home'), icon: Cloud },
-    { path: '/forecast', label: t('nav.forecast'), icon: Cloud, protected: true },
+    { path: '/', label: t('nav.home'), icon: House },
+    { path: '/forecast', label: t('nav.forecast'), icon: trending-up-down, protected: true },
     { path: '/leaderboard', label: t('nav.leaderboard'), icon: Trophy },
     { path: '/history', label: t('nav.history'), icon: History, protected: true },
   ];
@@ -41,9 +43,7 @@ function Layout() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-hurricane-500 rounded-full flex items-center justify-center">
-                <Cloud className="w-6 h-6 text-white" />
-              </div>
+              <img src="/logo.png" alt="Huracán Info" className="w-10 h-10 rounded-full" />
               <span className="font-bold text-xl text-hurricane-900 hidden sm:block">
                 Huracán Info
               </span>
