@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   Cloud,
   House,
-  trending-up-down,
+  TrendingUpDown,
   Trophy,
   History,
   LogOut,
@@ -28,7 +28,7 @@ function Layout() {
 
   const navItems = [
     { path: '/', label: t('nav.home'), icon: House },
-    { path: '/forecast', label: t('nav.forecast'), icon: trending-up-down, protected: true },
+    { path: '/forecast', label: t('nav.forecast'), icon: TrendingUpDown, protected: true },
     { path: '/leaderboard', label: t('nav.leaderboard'), icon: Trophy },
     { path: '/history', label: t('nav.history'), icon: History, protected: true },
   ];
