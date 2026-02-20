@@ -104,6 +104,13 @@ function Login() {
             </button>
           </form>
 
+          {/* Forgot password link */}
+          <p className="mt-4 text-center">
+            <Link to="/forgot-password" className="text-sm text-hurricane-600 hover:text-hurricane-700">
+              {t('auth.forgotPassword')}
+            </Link>
+          </p>
+
           {/* Register link */}
           <p className="mt-6 text-center text-gray-600">
             {t('auth.noAccount')}{' '}

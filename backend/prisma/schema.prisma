@@ -11,14 +11,16 @@ datasource db {
 }
 
 model User {
-  id            Int        @id @default(autoincrement())
-  email         String     @unique
-  username      String     @unique
-  passwordHash  String     @map("password_hash")
-  preferredLang String     @default("es") @map("preferred_lang") // 'es' or 'en'
-  totalPoints   Int        @default(0) @map("total_points")
-  createdAt     DateTime   @default(now()) @map("created_at")
-  updatedAt     DateTime   @updatedAt @map("updated_at")
+  id                    Int        @id @default(autoincrement())
+  email                 String     @unique
+  username              String     @unique
+  passwordHash          String     @map("password_hash")
+  preferredLang         String     @default("es") @map("preferred_lang") // 'es' or 'en'
+  totalPoints           Int        @default(0) @map("total_points")
+  passwordResetToken    String?    @map("password_reset_token")
+  passwordResetExpires  DateTime?  @map("password_reset_expires")
+  createdAt             DateTime   @default(now()) @map("created_at")
+  updatedAt             DateTime   @updatedAt @map("updated_at")
 
   forecasts     Forecast[]
   scores        Score[]
