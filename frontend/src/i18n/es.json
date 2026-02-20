@@ -39,7 +39,14 @@
     "invalidCredentials": "Credenciales inválidas",
     "emailRequired": "El correo electrónico es requerido",
     "passwordRequired": "La contraseña es requerida",
-    "passwordMin": "La contraseña debe tener al menos 8 caracteres"
+    "passwordMin": "La contraseña debe tener al menos 8 caracteres",
+    "changePassword": "Cambiar Contraseña",
+    "currentPassword": "Contraseña Actual",
+    "newPassword": "Nueva Contraseña",
+    "confirmNewPassword": "Confirmar Nueva Contraseña",
+    "passwordChanged": "¡Contraseña cambiada exitosamente!",
+    "currentPasswordIncorrect": "La contraseña actual es incorrecta",
+    "passwordsMustMatch": "Las contraseñas no coinciden"
   },
   "forecast": {
     "title": "Enviar Pronóstico",

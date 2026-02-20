@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { scoreAPI } from '../utils/api';
+import { scoreAPI, authAPI } from '../utils/api';
 import {
   History as HistoryIcon,
   Thermometer,
@@ -9,7 +9,8 @@ import {
   Star,
   Clock,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Lock
 } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -20,6 +21,15 @@ function History() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
+
+  // Change password state
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     async function fetchScores() {
@@ -48,6 +58,40 @@ function History() {
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError(t('auth.passwordsMustMatch'));
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setPasswordError(t('auth.passwordMin'));
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      await authAPI.changePassword({ currentPassword, newPassword });
+      setPasswordSuccess(t('auth.passwordChanged'));
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+      setTimeout(() => setShowChangePassword(false), 2000);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setPasswordError(t('auth.currentPasswordIncorrect'));
+      } else {
+        setPasswordError(err.response?.data?.error || t('errors.server'));
+      }
+    } finally {
+      setChangingPassword(false);
+    }
   };
 
   if (loading) {
@@ -295,6 +339,81 @@ function History() {
           ))}
         </div>
       )}
+
+      {/* Change Password Section */}
+      <div className="mt-8">
+        <button
+          onClick={() => { setShowChangePassword(!showChangePassword); setPasswordError(''); setPasswordSuccess(''); }}
+          className="flex items-center text-gray-600 hover:text-hurricane-600 font-medium transition-colors"
+        >
+          <Lock className="w-4 h-4 mr-2" />
+          {t('auth.changePassword')}
+          {showChangePassword ? <ChevronUp className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 ml-1" />}
+        </button>
+
+        {showChangePassword && (
+          <form onSubmit={handleChangePassword} className="bg-white rounded-xl shadow-md p-6 mt-3 max-w-md">
+            {passwordError && (
+              <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">{passwordError}</div>
+            )}
+            {passwordSuccess && (
+              <div className="mb-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm">{passwordSuccess}</div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.currentPassword')}</label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hurricane-500 focus:border-transparent"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.newPassword')}</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                minLength={8}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hurricane-500 focus:border-transparent"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.confirmNewPassword')}</label>
+              <input
+                type="password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                required
+                minLength={8}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hurricane-500 focus:border-transparent"
+              />
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                type="submit"
+                disabled={changingPassword}
+                className="px-4 py-2 bg-hurricane-500 text-white rounded-lg hover:bg-hurricane-600 transition-colors disabled:opacity-50"
+              >
+                {changingPassword ? t('common.loading') : t('auth.changePassword')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowChangePassword(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }
