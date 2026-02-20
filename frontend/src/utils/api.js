@@ -36,7 +36,9 @@ export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
   getMe: () => api.get('/auth/me'),
-  updatePreferences: (data) => api.patch('/auth/preferences', data)
+  updatePreferences: (data) => api.patch('/auth/preferences', data),
+  forgotPassword: (data) => api.post('/auth/forgot-password', data),
+  resetPassword: (data) => api.post('/auth/reset-password', data)
 };
 
 // Station endpoints
