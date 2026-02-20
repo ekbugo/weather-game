@@ -115,4 +115,54 @@ router.post('/reset-everything', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/admin/reset-password
+ * Reset a user's password to a temporary one
+ * The admin must communicate the temporary password to the user
+ * Body: { email: string }
+ * Returns the temporary password (only shown once)
+ */
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const prisma = req.prisma;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Generate a random temporary password
+    const crypto = require('crypto');
+    const tempPassword = crypto.randomBytes(6).toString('base64url'); // e.g. "k3Rf9xQ2m1"
+
+    // Hash and store it
+    const bcrypt = require('bcryptjs');
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(tempPassword, salt);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash }
+    });
+
+    console.log(`✅ Password reset for user ${user.username} (${user.email})`);
+
+    res.json({
+      success: true,
+      message: `Password reset for ${user.username}`,
+      username: user.username,
+      email: user.email,
+      temporaryPassword: tempPassword
+    });
+  } catch (error) {
+    console.error('Admin password reset error:', error);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
 module.exports = router;
