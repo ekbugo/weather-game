@@ -19,8 +19,8 @@
     { "date": "2026-03-12", "stationId": "IMARIC13", "notes": "INDIERA ALTA, MARICAO" },
     { "date": "2026-03-17", "stationId": "IVEGAB17", "notes": "Vega Baja" },
     { "date": "2026-03-19", "stationId": "IVEGAB17", "notes": "Vega Baja" },
-    { "date": "2026-03-25", "stationId": "IAGUAD73", "notes": "--AGUADILLA" },
-    { "date": "2026-03-27", "stationId": "IAGUAD73", "notes": "--AGUADILLA" },
+    { "date": "2026-03-25", "stationId": "ICABOR73", "notes": "Cabo Rojo" },
+    { "date": "2026-03-27", "stationId": "ICABOR73", "notes": "Cabo Rojo" },
     { "date": "2026-04-07", "stationId": "IAGUAD73", "notes": "--AGUADILLA" },
     { "date": "2026-04-09", "stationId": "IAGUAD73", "notes": "--AGUADILLA" },
     { "date": "2026-04-14", "stationId": "IAGUAD73", "notes": "--AGUADILLA" }
