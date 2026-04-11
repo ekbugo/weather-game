@@ -138,7 +138,7 @@ function UserProfile() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{profileData.user.username}</h1>
-            <p className="text-gray-500">Last 7 Days</p>
+            <p className="text-gray-500">All Time</p>
           </div>
         </div>
 
