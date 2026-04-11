@@ -1,6 +1,11 @@
 const express = require('express');
+const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
+
+// Every admin route requires a valid JWT AND admin privileges.
+// Applied at the router level so no endpoint can accidentally be left unprotected.
+router.use(authenticateToken, requireAdmin);
 
 /**
  * POST /api/admin/reset-scores

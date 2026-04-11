@@ -17,6 +17,7 @@ model User {
   passwordHash          String     @map("password_hash")
   preferredLang         String     @default("es") @map("preferred_lang") // 'es' or 'en'
   totalPoints           Int        @default(0) @map("total_points")
+  isAdmin               Boolean    @default(false) @map("is_admin")
   passwordResetToken    String?    @map("password_reset_token")
   passwordResetExpires  DateTime?  @map("password_reset_expires")
   createdAt             DateTime   @default(now()) @map("created_at")
