@@ -236,17 +236,10 @@ router.get('/user/:username', authenticateToken, async (req, res) => {
     });
     const rank = higherRankedCount + 1;
 
-    // Calculate date 7 days ago
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    // Get scores from last 7 days
+    // Get user's full score history
     const scores = await prisma.score.findMany({
       where: {
-        userId: targetUser.id,
-        scoreDate: {
-          gte: sevenDaysAgo
-        }
+        userId: targetUser.id
       },
       include: {
         forecast: {
@@ -263,10 +256,7 @@ router.get('/user/:username', authenticateToken, async (req, res) => {
 
     const totalInRange = await prisma.score.count({
       where: {
-        userId: targetUser.id,
-        scoreDate: {
-          gte: sevenDaysAgo
-        }
+        userId: targetUser.id
       }
     });
 
