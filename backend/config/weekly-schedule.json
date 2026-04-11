@@ -23,7 +23,12 @@
     { "date": "2026-03-27", "stationId": "ICABOR73", "notes": "Cabo Rojo" },
     { "date": "2026-04-07", "stationId": "IARECI36", "notes": "Arecibo" },
     { "date": "2026-04-09", "stationId": "IARECI36", "notes": "Arecibo" },
-    { "date": "2026-04-14", "stationId": "IAGUAD73", "notes": "--AGUADILLA" }
+    { "date": "2026-04-14", "stationId": "IAGUAD73", "notes": "--" },
+    { "date": "2026-04-16", "stationId": "ICABOR73", "notes": "--" },
+    { "date": "2026-04-21", "stationId": "ICABOR73", "notes": "--" },
+    { "date": "2026-04-23", "stationId": "IARECI36", "notes": "--" },
+    { "date": "2026-04-28", "stationId": "IARECI36", "notes": "--" },
+    { "date": "2026-04-30", "stationId": "IAGUAD73", "notes": "--" }
   ],
   "_instructions": "Edit this file to change the daily station schedule. Each entry is for a specific forecast date. If a station goes offline, simply change the stationId for that date. Valid stationIds: IMAYAG30, ICAYEY43, IAGUAD73, ICABOR73"
 }
