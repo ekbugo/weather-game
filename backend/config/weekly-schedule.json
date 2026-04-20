@@ -25,8 +25,8 @@
     { "date": "2026-04-09", "stationId": "IARECI36", "notes": "Arecibo" },
     { "date": "2026-04-14", "stationId": "IMAYAG30", "notes": "Mayagüez" },
     { "date": "2026-04-16", "stationId": "IMAYAG30", "notes": "Mayagüez" },
-    { "date": "2026-04-21", "stationId": "ICABOR73", "notes": "--" },
-    { "date": "2026-04-23", "stationId": "IARECI36", "notes": "--" },
+    { "date": "2026-04-21", "stationId": "IPONCE128", "notes": "Ponce" },
+    { "date": "2026-04-23", "stationId": "IPONCE128", "notes": "Ponce" },
     { "date": "2026-04-28", "stationId": "IARECI36", "notes": "--" },
     { "date": "2026-04-30", "stationId": "IAGUAD73", "notes": "--" }
   ],
